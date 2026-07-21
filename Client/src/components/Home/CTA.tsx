@@ -1,43 +1,57 @@
 import { Link } from "react-router-dom";
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, Sparkles } from "lucide-react";
+import SpecularButton from "../SpecularButton";
 
 export default function CTA() {
     return (
-        <section className="py-20" style={{ background: "#ffffff" }}>
+        <section className="py-20 bg-[#121214] text-zinc-100 border-t border-[#242429]">
             <div className="max-w-6xl mx-auto px-5 sm:px-8">
-                <div
-                    className="relative rounded-3xl overflow-hidden p-14 sm:p-20 text-center"
-                    style={{
-                        background: "linear-gradient(145deg, #fff5f5 0%, #fef2f2 100%)",
-                        border: "1.5px solid rgba(239,68,68,0.12)",
-                    }}
-                >
-                    {/* Glow blobs */}
-                    <div className="absolute top-0 right-0 w-96 h-96 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(239,68,68,0.1) 0%, transparent 70%)" }} />
-                    <div className="absolute bottom-0 left-0 w-72 h-72 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(239,68,68,0.06) 0%, transparent 70%)" }} />
+                <div className="relative rounded-3xl overflow-hidden p-12 sm:p-16 text-center bg-[#1c1c20] border border-[#2c2c33] shadow-2xl">
+                    {/* Orange glow blobs */}
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-                    <div className="relative">
-                        <div className="mb-6 inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/15 text-red-500 text-[11px] font-medium tracking-[0.06em] uppercase px-3.5 py-1.5 rounded-full">Ready to grow?</div>
-                        <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl leading-tight font-medium text-gray-900">
+                    <div className="relative z-10">
+                        <div className="mb-6 inline-flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold px-4 py-1.5 rounded-full">
+                            <Sparkles className="size-3.5 text-orange-400" />
+                            <span>Ready to grow?</span>
+                        </div>
+                        <h2 className="font-sans font-extrabold text-4xl sm:text-5xl md:text-6xl leading-tight text-white tracking-tight">
                             Automate your social
                             <br />
-                            <span className="text-red-400 italic">media today</span>
+                            <span className="text-orange-500 italic">media today</span>
                         </h2>
-                        <p className="mt-6 text-gray-500 max-w-lg mx-auto  text-lg">Join thousands of creators and marketers who trust Scheduler to grow their audience on autopilot.</p>
+                        <p className="mt-6 text-zinc-400 max-w-lg mx-auto text-sm leading-relaxed">
+                            Join thousands of creators and marketers who trust SocialSparrow to grow their audience on autopilot.
+                        </p>
 
-                        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-                            <Link to="/login" className="bg-red-500 text-white rounded-full font-semibold hover:bg-red-600 hover:shadow-[0_8px_24px_rgba(239,68,68,0.35)] inline-flex items-center gap-2 text-[15px] px-10 py-4 w-full sm:w-auto justify-center">
-                                Get Started Free <ArrowRightIcon className="size-4" />
+                        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <Link to="/login" className="w-full sm:w-auto">
+                                <SpecularButton
+                                    size="lg"
+                                    radius={16}
+                                    tint="#ff6b00"
+                                    tintOpacity={0.25}
+                                    lineColor="#ff9d42"
+                                    baseColor="#7c2d12"
+                                    speed={0.4}
+                                    intensity={1.3}
+                                    className="w-full sm:w-auto px-10 py-4 font-bold text-sm shadow-xl shadow-orange-500/20"
+                                >
+                                    <span>Get Started Free</span>
+                                    <ArrowRightIcon className="size-4 text-orange-400" />
+                                </SpecularButton>
                             </Link>
-                            <a href="#pricing" className="bg-transparent text-[#333] border-[1.5px] border-black/10 rounded-full font-medium hover:bg-black/5 hover:border-black/20 inline-flex items-center gap-2 text-[15px] px-10 py-4 w-full sm:w-auto justify-center">
+                            <a href="#pricing" className="bg-[#242429] text-zinc-200 border border-[#2c2c33] hover:bg-[#2c2c33] hover:text-white rounded-xl font-semibold inline-flex items-center gap-2 text-sm px-8 py-4 w-full sm:w-auto justify-center transition-all">
                                 View Pricing
                             </a>
                         </div>
 
-                        <p className="mt-6 text-xs text-gray-400">No credit card required · Cancel anytime</p>
+                        <p className="mt-6 text-xs text-zinc-500">No credit card required · Cancel anytime</p>
                     </div>
                 </div>
             </div>
         </section>
     );
 }
+

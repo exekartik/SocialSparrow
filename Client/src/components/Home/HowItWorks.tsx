@@ -8,32 +8,32 @@ const steps = [
 
 export default function HowItWorks() {
     return (
-        <section id="how-it-works" className="py-24 bg-white">
+        <section id="how-it-works" className="py-24 bg-[#121214] text-zinc-100 border-t border-[#242429]">
             <div className="max-w-4xl mx-auto px-4 sm:px-6">
                 <div className="text-center mb-16">
-                    <div className="mb-6 inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/15 text-red-500 text-[11px] font-medium tracking-[0.06em] uppercase px-3.5 py-1.5 rounded-full">
-                        <CheckCircleIcon className="size-3" />
-                        Simple setup
+                    <div className="mb-6 inline-flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold px-4 py-1.5 rounded-full">
+                        <CheckCircleIcon className="size-3.5" />
+                        <span>Simple setup</span>
                     </div>
-                    <h2 className="font-serif font-medium text-4xl sm:text-5xl leading-tight text-gray-900">
-                        Up and running in <span className="text-red-400 italic">minutes</span>
+                    <h2 className="font-sans font-extrabold text-4xl sm:text-5xl leading-tight text-white tracking-tight">
+                        Up and running in <span className="text-orange-500 italic">minutes</span>
                     </h2>
-                    <p className="mt-5 text-gray-500 max-w-lg mx-auto leading-relaxed">No complicated onboarding, no steep learning curve. Just connect, create, and grow.</p>
+                    <p className="mt-5 text-zinc-400 text-sm max-w-lg mx-auto leading-relaxed">No complicated onboarding, no steep learning curve. Just connect, create, and grow.</p>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-4">
                     {steps.map((s, i) => (
-                        <div key={s.step} className="flex gap-6 items-start">
-                            <div className="shrink-0 size-12 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center">
-                                <span className="text-sm font-medium text-red-500">{s.step}</span>
+                        <div key={s.step} className="p-6 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] flex gap-6 items-start hover:border-orange-500/40 transition-all">
+                            <div className="shrink-0 size-12 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center">
+                                <span className="text-sm font-bold text-orange-400">{s.step}</span>
                             </div>
-                            <div className="pt-1">
-                                <h3 className=" text-slate-900 mb-1">{s.title}</h3>
-                                <p className="text-slate-500 text-sm leading-relaxed">{s.description}</p>
+                            <div className="pt-1 flex-1">
+                                <h3 className="text-white font-bold text-base mb-1">{s.title}</h3>
+                                <p className="text-zinc-400 text-xs leading-relaxed">{s.description}</p>
                             </div>
                             {i < steps.length - 1 && (
                                 <div className="hidden sm:block ml-auto shrink-0 self-center">
-                                    <ArrowRightIcon className="size-4 text-slate-200" />
+                                    <ArrowRightIcon className="size-4 text-zinc-600" />
                                 </div>
                             )}
                         </div>
@@ -43,3 +43,4 @@ export default function HowItWorks() {
         </section>
     );
 }
+
