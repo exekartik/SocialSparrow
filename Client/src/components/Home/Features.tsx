@@ -1,5 +1,6 @@
 import { CalendarDaysIcon, Wand2Icon, Share2Icon, ZapIcon, BarChart3Icon, HashIcon } from "lucide-react";
 import SpotlightCard from "../SpotlightCard";
+import ScrollReveal from "../ScrollReveal";
 
 const features = [
     {
@@ -38,36 +39,38 @@ export default function Features() {
     return (
         <section id="features" className="py-24 bg-[#121214] text-zinc-100 border-t border-[#242429]">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
-                <div className="text-center mb-16">
-                    <div className="mb-6 inline-flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold px-4 py-1.5 rounded-full">
-                        <ZapIcon className="size-3.5" />
-                        <span>Everything you need</span>
+                <ScrollReveal variant="flipUp" delay={0.1}>
+                    <div className="text-center mb-16">
+                        <div className="mb-6 inline-flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold px-4 py-1.5 rounded-full">
+                            <ZapIcon className="size-3.5" />
+                            <span>Everything you need</span>
+                        </div>
+                        <h2 className="font-sans text-4xl sm:text-5xl font-extrabold leading-tight text-white tracking-tight">
+                            Automate your entire
+                            <br />
+                            <span className="text-orange-500 italic">social media workflow</span>
+                        </h2>
+                        <p className="mt-5 text-zinc-400 max-w-xl mx-auto text-sm leading-relaxed">From content creation to scheduling — SocialSparrow handles it all so you can focus on what matters most.</p>
                     </div>
-                    <h2 className="font-sans text-4xl sm:text-5xl font-extrabold leading-tight text-white tracking-tight">
-                        Automate your entire
-                        <br />
-                        <span className="text-orange-500 italic">social media workflow</span>
-                    </h2>
-                    <p className="mt-5 text-zinc-400 max-w-xl mx-auto text-sm leading-relaxed">From content creation to scheduling — SocialSparrow handles it all so you can focus on what matters most.</p>
-                </div>
+                </ScrollReveal>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {features.map((f) => (
-                        <SpotlightCard
-                            key={f.title}
-                            spotlightColor="rgba(255, 107, 0, 0.18)"
-                            className="bg-[#1a1a1e] border border-[#2c2c33] p-6 hover:border-orange-500/40 hover:-translate-y-1 transition-all duration-200 group shadow-md"
-                        >
-                            <div className="size-10 rounded-xl bg-orange-500/15 border border-orange-500/25 text-orange-400 flex items-center justify-center mb-4 group-hover:bg-orange-500 group-hover:text-white transition-colors">
-                                <f.icon className="size-5" />
-                            </div>
-                            <h3 className="text-white font-bold text-base mb-2">{f.title}</h3>
-                            <p className="text-xs text-zinc-400 leading-relaxed">{f.description}</p>
-                        </SpotlightCard>
+                    {features.map((f, idx) => (
+                        <ScrollReveal key={f.title} variant="grow" delay={idx * 0.1} duration={0.5}>
+                            <SpotlightCard
+                                spotlightColor="rgba(255, 107, 0, 0.18)"
+                                className="bg-[#1a1a1e] border border-[#2c2c33] p-6 hover:border-orange-500/40 hover:-translate-y-1 transition-all duration-200 group shadow-md h-full"
+                            >
+                                <div className="size-10 rounded-xl bg-orange-500/15 border border-orange-500/25 text-orange-400 flex items-center justify-center mb-4 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                                    <f.icon className="size-5" />
+                                </div>
+                                <h3 className="text-white font-bold text-base mb-2">{f.title}</h3>
+                                <p className="text-xs text-zinc-400 leading-relaxed">{f.description}</p>
+                            </SpotlightCard>
+                        </ScrollReveal>
                     ))}
                 </div>
             </div>
         </section>
     );
 }
-

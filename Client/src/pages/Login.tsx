@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MailIcon, LockIcon, ArrowRightIcon, User2Icon, Bird } from "lucide-react";
+import AutumnLeavesCanvas from "../components/AutumnLeavesCanvas";
+import TiltedCard from "../components/TiltedCard";
 
 export default function Login() {
     const [loginState, setLoginState] = useState(true);
@@ -20,12 +22,37 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-[#121214] text-zinc-100 flex items-center justify-center p-4">
-            <div className="relative w-full max-w-md">
-                <div className="bg-[#1a1a1e] border border-[#2c2c33] rounded-2xl shadow-2xl p-8">
+        <div className="relative min-h-screen bg-[#121214] text-zinc-100 flex items-center justify-center p-4 overflow-hidden selection:bg-orange-500/30">
+            {/* Background Japanese Autumn Wallpaper */}
+            <div 
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-35 scale-105 filter blur-[1px] transition-all duration-1000"
+                style={{ backgroundImage: `url('/assets/japanese_autumn_bg.png')` }}
+            />
+
+            {/* Radial Gradient Overlays for Seamless Dark Blend */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#121214] via-[#121214]/60 to-[#121214]/90 pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-orange-500/10 via-transparent to-[#121214] pointer-events-none" />
+
+            {/* Real-time Japanese Momiji & Ginkgo Falling Leaves Canvas */}
+            <AutumnLeavesCanvas />
+
+            {/* Glowing Ambient Background Lights */}
+            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-600/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Center Login Glassmorphism Card */}
+            <div className="relative z-20 w-full max-w-md">
+                <TiltedCard
+                    rotateAmplitude={8}
+                    scaleOnHover={1.02}
+                    showMobileWarning={false}
+                    showTooltip={false}
+                >
+                    <div className="relative bg-[#1a1a1e]/85 backdrop-blur-xl border border-[#2c2c33] hover:border-orange-500/30 rounded-2xl shadow-2xl shadow-orange-950/40 p-8 transition-all duration-300">
+                    
                     <div className="flex flex-col items-center mb-8">
                         <Link to="/" className="flex items-center gap-3 group mb-2">
-                            <div className="p-2.5 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 text-white shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform">
+                            <div className="p-2.5 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 text-white shadow-lg shadow-orange-500/25 group-hover:scale-105 transition-transform duration-300">
                                 <Bird className="size-6" />
                             </div>
                             <span className="font-bold text-xl text-white tracking-wide">
@@ -47,7 +74,7 @@ export default function Login() {
                                         type="text" 
                                         required 
                                         placeholder="Enter your name" 
-                                        className="w-full pl-10 pr-4 py-2.5 bg-[#202025] border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 
+                                        className="w-full pl-10 pr-4 py-2.5 bg-[#202025]/90 border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 
                                         value={name} 
                                         onChange={(e) => setName(e.target.value)} 
                                     />
@@ -63,7 +90,7 @@ export default function Login() {
                                     type="email" 
                                     required 
                                     placeholder="you@company.com" 
-                                    className="w-full pl-10 pr-4 py-2.5 bg-[#202025] border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 
+                                    className="w-full pl-10 pr-4 py-2.5 bg-[#202025]/90 border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 
                                     value={email} 
                                     onChange={(e) => setEmail(e.target.value)} 
                                 />
@@ -78,7 +105,7 @@ export default function Login() {
                                     type="password" 
                                     required 
                                     placeholder="••••••••" 
-                                    className="w-full pl-10 pr-4 py-2.5 bg-[#202025] border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 
+                                    className="w-full pl-10 pr-4 py-2.5 bg-[#202025]/90 border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 
                                     value={password} 
                                     onChange={(e) => setPassword(e.target.value)} 
                                 />
@@ -88,7 +115,7 @@ export default function Login() {
                         <button 
                             type="submit" 
                             disabled={loading} 
-                            className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-amber-500 text-white font-semibold rounded-xl text-xs transition-all shadow-lg shadow-orange-500/20 disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
+                            className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-amber-500 text-white font-semibold rounded-xl text-xs transition-all shadow-lg shadow-orange-500/25 active:scale-[0.99] disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
                         >
                             {loading ? (
                                 "Authenticating..."
@@ -118,8 +145,8 @@ export default function Login() {
                         )}
                     </div>
                 </div>
-            </div>
+            </TiltedCard>
         </div>
-    );
+    </div>
+);
 }
-

@@ -179,9 +179,9 @@ const SpecularButton = ({
 
     const sizeRef = { w: 1, h: 1 };
     const resize = () => {
-      const rect = btn.getBoundingClientRect();
-      const w = rect.width;
-      const h = rect.height;
+      const w = btn.offsetWidth;
+      const h = btn.offsetHeight;
+      if (w === 0 || h === 0) return;
       sizeRef.w = w;
       sizeRef.h = h;
       renderer.setSize(w + PAD * 2, h + PAD * 2);
@@ -195,6 +195,9 @@ const SpecularButton = ({
     let pointerAngle: number | null = null;
     let proximityT = 0;
     const onPointerMove = (e: PointerEvent) => {
+      if (btn.offsetWidth !== sizeRef.w || btn.offsetHeight !== sizeRef.h) {
+        resize();
+      }
       const rect = btn.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
@@ -202,9 +205,9 @@ const SpecularButton = ({
       const dy = Math.max(rect.top - e.clientY, 0, e.clientY - rect.bottom);
       const dist = Math.hypot(dx, dy);
       if (dist === 0) {
-        const nx = (e.clientX - cx) / (rect.width / 2);
-        const ny = (cy - e.clientY) / (rect.height / 2);
-        pointerAngle = Math.atan2(2 / rect.height, -2 / rect.width) + nx * 0.3 + ny * 0.15;
+        const nx = (e.clientX - cx) / (rect.width / 2 || 1);
+        const ny = (cy - e.clientY) / (rect.height / 2 || 1);
+        pointerAngle = Math.atan2(2 / (rect.height || 1), -2 / (rect.width || 1)) + nx * 0.3 + ny * 0.15;
       } else {
         pointerAngle = Math.atan2(cy - e.clientY, e.clientX - cx);
       }
@@ -277,7 +280,7 @@ const SpecularButton = ({
         } as CSSProperties
       }
     >
-      <span ref={fxRef} aria-hidden="true" className="pointer-events-none absolute -inset-5 z-[1] [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full" />
+      <span ref={fxRef} aria-hidden="true" className="pointer-events-none absolute z-[1] [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full" style={{ left: -PAD, top: -PAD, right: -PAD, bottom: -PAD }} />
       <span className="relative z-[2] inline-flex items-center justify-center gap-2 w-full">{children}</span>
     </button>
   );
