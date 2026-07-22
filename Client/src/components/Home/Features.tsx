@@ -1,4 +1,5 @@
 import { CalendarDaysIcon, Wand2Icon, Share2Icon, ZapIcon, BarChart3Icon, HashIcon } from "lucide-react";
+import SpotlightCard from "../SpotlightCard";
 
 const features = [
     {
@@ -52,13 +53,17 @@ export default function Features() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {features.map((f) => (
-                        <div key={f.title} className="bg-[#1a1a1e] rounded-2xl border border-[#2c2c33] p-6 hover:border-orange-500/40 hover:-translate-y-1 transition-all duration-200 group shadow-md">
+                        <SpotlightCard
+                            key={f.title}
+                            spotlightColor="rgba(255, 107, 0, 0.18)"
+                            className="bg-[#1a1a1e] border border-[#2c2c33] p-6 hover:border-orange-500/40 hover:-translate-y-1 transition-all duration-200 group shadow-md"
+                        >
                             <div className="size-10 rounded-xl bg-orange-500/15 border border-orange-500/25 text-orange-400 flex items-center justify-center mb-4 group-hover:bg-orange-500 group-hover:text-white transition-colors">
                                 <f.icon className="size-5" />
                             </div>
                             <h3 className="text-white font-bold text-base mb-2">{f.title}</h3>
                             <p className="text-xs text-zinc-400 leading-relaxed">{f.description}</p>
-                        </div>
+                        </SpotlightCard>
                     ))}
                 </div>
             </div>

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRightIcon, DotIcon, Sparkles } from "lucide-react";
 import SpecularButton from "../SpecularButton";
+import TiltedCard from "../TiltedCard";
 
 export default function Hero() {
     return (
@@ -58,51 +59,58 @@ export default function Hero() {
 
             {/* Dashboard Mockup Plate */}
             <div className="relative max-w-5xl mx-auto px-5 sm:px-8 pb-12">
-                <div className="rounded-2xl overflow-hidden border border-[#2c2c33] bg-[#1a1a1e] shadow-2xl">
-                    {/* Browser chrome */}
-                    <div className="flex items-center gap-2 px-4 py-3 bg-[#18181c] border-b border-[#242429]">
-                        <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                        <div className="w-3 h-3 rounded-full bg-amber-500/80" />
-                        <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-                        <div className="flex-1 mx-4 rounded-lg h-5 max-w-xs bg-[#202025] border border-[#2c2c33] text-[10px] text-zinc-500 flex items-center px-3">
-                            socialsparrow.app/dashboard
-                        </div>
-                    </div>
-
-                    {/* Mock Content Plates */}
-                    <div className="p-6 bg-[#121214] space-y-4">
-                        {/* Stat row */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            {[
-                                { val: "142", label: "Scheduled Posts" },
-                                { val: "48.2k", label: "Total Engagement" },
-                                { val: "4", label: "Connected Accounts" },
-                                { val: "18.4 hrs", label: "AI Time Saved" },
-                            ].map((s) => (
-                                <div key={s.label} className="rounded-xl p-4 bg-[#1a1a1e] border border-[#2c2c33]">
-                                    <div className="text-xl font-bold text-white tracking-tight">{s.val}</div>
-                                    <div className="text-xs text-zinc-400 mt-1">{s.label}</div>
-                                </div>
-                            ))}
+                <TiltedCard
+                    rotateAmplitude={8}
+                    scaleOnHover={1.02}
+                    showMobileWarning={false}
+                    showTooltip={false}
+                >
+                    <div className="rounded-2xl overflow-hidden border border-[#2c2c33] bg-[#1a1a1e] shadow-2xl">
+                        {/* Browser chrome */}
+                        <div className="flex items-center gap-2 px-4 py-3 bg-[#18181c] border-b border-[#242429]">
+                            <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                            <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                            <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                            <div className="flex-1 mx-4 rounded-lg h-5 max-w-xs bg-[#202025] border border-[#2c2c33] text-[10px] text-zinc-500 flex items-center px-3">
+                                socialsparrow.app/dashboard
+                            </div>
                         </div>
 
-                        {/* Activity list */}
-                        <div className="rounded-xl p-4 space-y-3 bg-[#1a1a1e] border border-[#2c2c33]">
-                            <div className="text-[10px] font-semibold text-orange-400 uppercase tracking-widest mb-3">Live Feed Activity</div>
-                            {[
-                                { text: "Post published to LinkedIn & Twitter", time: "2m ago" },
-                                { text: "AI generated 5 viral thread variations", time: "15m ago" },
-                                { text: "New campaign scheduled for tomorrow 9am", time: "1h ago" },
-                            ].map((item) => (
-                                <div key={item.text} className="flex items-center gap-3">
-                                    <DotIcon className="size-5 text-orange-500 shrink-0" />
-                                    <span className="text-xs text-zinc-300 flex-1">{item.text}</span>
-                                    <span className="text-[11px] text-zinc-500 shrink-0">{item.time}</span>
-                                </div>
-                            ))}
+                        {/* Mock Content Plates */}
+                        <div className="p-6 bg-[#121214] space-y-4">
+                            {/* Stat row */}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                {[
+                                    { val: "142", label: "Scheduled Posts" },
+                                    { val: "48.2k", label: "Total Engagement" },
+                                    { val: "4", label: "Connected Accounts" },
+                                    { val: "18.4 hrs", label: "AI Time Saved" },
+                                ].map((s) => (
+                                    <div key={s.label} className="rounded-xl p-4 bg-[#1a1a1e] border border-[#2c2c33]">
+                                        <div className="text-xl font-bold text-white tracking-tight">{s.val}</div>
+                                        <div className="text-xs text-zinc-400 mt-1">{s.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Activity list */}
+                            <div className="rounded-xl p-4 space-y-3 bg-[#1a1a1e] border border-[#2c2c33]">
+                                <div className="text-[10px] font-semibold text-orange-400 uppercase tracking-widest mb-3">Live Feed Activity</div>
+                                {[
+                                    { text: "Post published to LinkedIn & Twitter", time: "2m ago" },
+                                    { text: "AI generated 5 viral thread variations", time: "15m ago" },
+                                    { text: "New campaign scheduled for tomorrow 9am", time: "1h ago" },
+                                ].map((item) => (
+                                    <div key={item.text} className="flex items-center gap-3">
+                                        <DotIcon className="size-5 text-orange-500 shrink-0" />
+                                        <span className="text-xs text-zinc-300 flex-1">{item.text}</span>
+                                        <span className="text-[11px] text-zinc-500 shrink-0">{item.time}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
+                </TiltedCard>
             </div>
         </section>
     );

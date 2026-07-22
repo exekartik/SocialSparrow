@@ -11,10 +11,30 @@
     --color-text: #f4f4f5;
     --font-sans: "Outfit", sans-serif;
     --font-serif: "Urbanist", sans-serif;
+
+    --animate-meteor: meteor 5s linear infinite;
+
+    @keyframes meteor {
+        0% {
+            transform: rotate(215deg) translateX(0);
+            opacity: 1;
+        }
+        70% {
+            opacity: 1;
+        }
+        100% {
+            transform: rotate(215deg) translateX(-600px);
+            opacity: 0;
+        }
+    }
 }
 
 * {
     box-sizing: border-box;
+}
+
+*, *::before, *::after, body, button, a, input, textarea, select {
+    cursor: none !important;
 }
 
 html {

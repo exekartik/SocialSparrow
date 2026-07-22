@@ -1,12 +1,52 @@
-import { ArrowRightIcon, CheckCircleIcon } from "lucide-react";
+import React, { useState } from "react";
+import { CheckCircleIcon, ChevronDownIcon } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+
+import SpotlightCard from "../SpotlightCard";
 
 const steps = [
-    { step: "01", title: "Connect Your Accounts", description: "Link your social profiles in seconds. We support Twitter, LinkedIn, Facebook, and Instagram." },
-    { step: "02", title: "Create or Generate Content", description: "Write your own post or let our AI craft a caption and image based on your prompt." },
-    { step: "03", title: "Schedule & Publish", description: "Pick a time, select your platforms, and hit schedule. We handle publishing automatically." },
+    { 
+        step: "01", 
+        title: "Connect Your Accounts", 
+        description: "Link your social profiles in seconds. We support Twitter, LinkedIn, Facebook, and Instagram.",
+        details: "SocialSparrow is fully verified and uses official API integrations to ensure your account security and stable post delivery.",
+        bullets: [
+            "🔒 Verified OAuth API connections",
+            "🚀 Instant sync for multiple profiles",
+            "🛠️ Simple, secure credentials"
+        ]
+    },
+    { 
+        step: "02", 
+        title: "Create or Generate Content", 
+        description: "Write your own post or let our AI craft a caption and image based on your prompt.",
+        details: "Write custom copy or prompt our AI engine. Adjust tone, format, and platform targets to compose high-quality posts optimized for higher organic outreach.",
+        bullets: [
+            "🧠 AI tone tuning (casual, viral)",
+            "🎨 Easy media and link attachments",
+            "🏷️ Auto hashtag auto-generation"
+        ]
+    },
+    { 
+        step: "03", 
+        title: "Schedule & Publish", 
+        description: "Pick a time, select your platforms, and hit schedule. We handle publishing automatically.",
+        details: "Queue posts in your visual calendar. SocialSparrow publishes them on schedule, handles timezone offsets automatically, and saves recent logs to your dashboard.",
+        bullets: [
+            "⏰ Content calendar timeline view",
+            "🌍 Advanced global timezone sync",
+            "📊 Queue feeding and status reports"
+        ]
+    },
 ];
 
 export default function HowItWorks() {
+    const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+    const toggleIndex = (index: number) => {
+        setOpenIndex(openIndex === index ? null : index);
+    };
+
     return (
         <section id="how-it-works" className="py-24 bg-[#121214] text-zinc-100 border-t border-[#242429]">
             <div className="max-w-4xl mx-auto px-4 sm:px-6">
@@ -22,22 +62,63 @@ export default function HowItWorks() {
                 </div>
 
                 <div className="space-y-4">
-                    {steps.map((s, i) => (
-                        <div key={s.step} className="p-6 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] flex gap-6 items-start hover:border-orange-500/40 transition-all">
-                            <div className="shrink-0 size-12 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center">
-                                <span className="text-sm font-bold text-orange-400">{s.step}</span>
-                            </div>
-                            <div className="pt-1 flex-1">
-                                <h3 className="text-white font-bold text-base mb-1">{s.title}</h3>
-                                <p className="text-zinc-400 text-xs leading-relaxed">{s.description}</p>
-                            </div>
-                            {i < steps.length - 1 && (
-                                <div className="hidden sm:block ml-auto shrink-0 self-center">
-                                    <ArrowRightIcon className="size-4 text-zinc-600" />
+                    {steps.map((s, i) => {
+                        const isOpen = openIndex === i;
+                        return (
+                            <SpotlightCard
+                                key={s.step} 
+                                spotlightColor="rgba(255, 107, 0, 0.18)"
+                                className={`p-6 rounded-2xl bg-[#1a1a1e] border transition-all duration-300 cursor-pointer select-none ${
+                                    isOpen ? 'border-orange-500/60 shadow-lg shadow-orange-500/5' : 'border-[#2c2c33] hover:border-zinc-700'
+                                }`}
+                                onClick={() => toggleIndex(i)}
+                            >
+                                <div className="flex gap-5 items-center justify-between">
+                                    <div className="flex gap-5 items-center">
+                                        <div className={`shrink-0 size-10 rounded-xl flex items-center justify-center border transition-colors ${
+                                            isOpen ? 'bg-orange-500/20 border-orange-500/40' : 'bg-[#202025] border-[#2c2c33]'
+                                        }`}>
+                                            <span className={`text-xs font-bold ${isOpen ? 'text-orange-400' : 'text-zinc-400'}`}>{s.step}</span>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-white font-bold text-sm sm:text-base">{s.title}</h3>
+                                            <p className="text-zinc-400 text-xs mt-0.5">{s.description}</p>
+                                        </div>
+                                    </div>
+                                    <div className="shrink-0 ml-4">
+                                        <ChevronDownIcon className={`size-4 text-zinc-400 transition-transform duration-300 ${
+                                            isOpen ? 'rotate-180 text-orange-400' : ''
+                                        }`} />
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-                    ))}
+
+                                <AnimatePresence initial={false}>
+                                    {isOpen && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: "auto", opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                                            className="overflow-hidden"
+                                        >
+                                            <div className="pt-5 mt-4 border-t border-[#2c2c33] space-y-4">
+                                                <p className="text-zinc-350 text-[11px] sm:text-xs leading-relaxed">
+                                                    {s.details}
+                                                </p>
+                                                <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                                    {s.bullets.map((b) => (
+                                                        <li key={b} className="p-3 rounded-xl bg-[#202025] border border-[#2c2c33] text-[10px] sm:text-xs text-zinc-300 font-medium">
+                                                            {b}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </SpotlightCard>
+                        );
+                    })}
                 </div>
             </div>
         </section>

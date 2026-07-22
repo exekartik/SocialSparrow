@@ -6,10 +6,12 @@ import Dashboard from "./pages/Dashboard";
 import Account from "./pages/Account";
 import AIcomposer from "./pages/AIcomposer";
 import Scheduler from "./pages/Scheduler";
+import CustomCursor from "./components/CustomCursor";
 
 export default function App() {
     return (
         <>
+            <CustomCursor />
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
