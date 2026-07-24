@@ -169,48 +169,31 @@ export const genreatepost = async (req: AuthRequest, res: Response): Promise<voi
         // 1. Generate post content and image prompt
         const { content, imagePrompt } = await generateWithGemini(prompt, tone);
 
-        // 2. Generate and verify Image URL using Pollinations.ai
+        // 2. AI Image Generation (Currently paused/commented out as requested)
         let mediaUrl: string | undefined = undefined;
         let mediaType: "image" | "video" | undefined = undefined;
 
-        if (generateImage !== false) {
+        /*
+        // AI Image Generation feature currently paused
+        if (generateImage === true) {
             const encodedPrompt = encodeURIComponent(imagePrompt);
             const candidateUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
-
-            const verification = await verifyGeneratedImageUrl(candidateUrl);
-
-            if (!verification.success) {
-                console.error(`[IMAGE GENERATION ERROR] Image check failed for prompt: "${imagePrompt}". Error: ${verification.error}`);
-                res.status(502).json({
-                    success: false,
-                    message: "Image generation failed. Could not verify generated image URL.",
-                    debug: {
-                        attemptedUrl: candidateUrl,
-                        imagePrompt,
-                        error: verification.error,
-                        status: verification.status
-                    }
-                });
-                return;
-            }
+            mediaUrl = candidateUrl;
+            mediaType = "image";
 
             try {
                 // Upload to Cloudinary for persistence
                 const uploadResult = await cloudinary.uploader.upload(candidateUrl, {
                     folder: "ai-generations"
                 });
-                mediaUrl = uploadResult.secure_url;
-                mediaType = "image";
+                if (uploadResult && uploadResult.secure_url) {
+                    mediaUrl = uploadResult.secure_url;
+                }
             } catch (uploadErr: any) {
-                console.error("Image generation failed (Cloudinary upload error):", uploadErr);
-                res.status(502).json({
-                    success: false,
-                    message: "Image generation failed during persistence upload.",
-                    debug: { error: uploadErr?.message || uploadErr }
-                });
-                return;
+                console.warn("Cloudinary persistence upload warning (using Pollinations URL fallback):", uploadErr?.message || uploadErr);
             }
         }
+        */
 
         // 3. Save generation record to MongoDB
         const generation = await Generation.create({

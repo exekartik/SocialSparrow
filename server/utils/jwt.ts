@@ -1,45 +1,37 @@
 import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
 
-/**
- * ===========================================================
- *   JWT UTILITIES
- * 
- *   Purpose:
- *   Handles the generation of JSON Web Tokens for authentication.
- * ===========================================================
- */
+const getAccessSecret = () => {
+    return process.env.JWT_SECRET || process.env.JWT_ACCESS_SECRET || "fallbackSecret";
+};
+
+const getRefreshSecret = () => {
+    return process.env.JWT_REFRESH_SECRET || "fallbackRefreshSecret";
+};
 
 /**
  * Generates an Access Token for a given user ID.
- * Access tokens are typically short-lived and used for authenticating API requests.
- * 
- * @param userId - The MongoDB ObjectId of the user
- * @returns The signed JWT access token string
+ * Defaults to 7d in development to prevent frequent session expiration.
  */
 export const generateAccessToken = (userId: Types.ObjectId | string): string => {
     return jwt.sign(
         { id: userId.toString() },
-        process.env.JWT_SECRET || "fallbackSecret",
+        getAccessSecret(),
         {
-            expiresIn: (process.env.JWT_EXPIRES_IN || "15m") as jwt.SignOptions["expiresIn"],
+            expiresIn: (process.env.JWT_EXPIRES_IN || process.env.JWT_ACCESS_EXPIRES || "7d") as jwt.SignOptions["expiresIn"],
         }
     );
 };
 
 /**
  * Generates a Refresh Token for a given user ID.
- * Refresh tokens are long-lived and used to request new access tokens without logging in again.
- * 
- * @param userId - The MongoDB ObjectId of the user
- * @returns The signed JWT refresh token string
  */
 export const generateRefreshToken = (userId: Types.ObjectId | string): string => {
     return jwt.sign(
         { id: userId.toString() },
-        process.env.JWT_REFRESH_SECRET || "fallbackRefreshSecret",
+        getRefreshSecret(),
         {
-            expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || "7d") as jwt.SignOptions["expiresIn"],
+            expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || process.env.JWT_REFRESH_EXPIRES || "30d") as jwt.SignOptions["expiresIn"],
         }
     );
 };

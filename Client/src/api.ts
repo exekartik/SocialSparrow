@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+
 const BASE_URL = "http://localhost:3000/api";
 
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
@@ -18,6 +20,18 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
         ...options,
         headers,
     });
+
+    if (res.status === 401) {
+        const hasToken = Boolean(localStorage.getItem("token"));
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        if (hasToken && !window.location.pathname.includes("/login")) {
+            toast.error("Session expired. Please sign in again.");
+            window.location.href = "/login";
+        }
+        throw new Error("Invalid or expired token.");
+    }
 
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {

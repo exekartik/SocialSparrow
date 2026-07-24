@@ -19,6 +19,34 @@ export interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * Decodes a JWT token client-side and checks if it is expired
+ */
+export const isTokenExpired = (token: string | null): boolean => {
+    if (!token) return true;
+    try {
+        const parts = token.split('.');
+        if (parts.length !== 3) return true;
+        
+        const base64Url = parts[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            window.atob(base64)
+                .split('')
+                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+        
+        const payload = JSON.parse(jsonPayload);
+        if (typeof payload.exp !== 'number') return false;
+        
+        const currentSeconds = Math.floor(Date.now() / 1000);
+        return payload.exp < currentSeconds;
+    } catch (e) {
+        return true;
+    }
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
@@ -29,12 +57,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const storedToken = localStorage.getItem("token");
 
         if (storedUser && storedToken) {
-            try {
-                setUser(JSON.parse(storedUser));
-                setToken(storedToken);
-            } catch (e) {
+            if (isTokenExpired(storedToken)) {
                 localStorage.removeItem("user");
                 localStorage.removeItem("token");
+                setUser(null);
+                setToken(null);
+            } else {
+                try {
+                    setUser(JSON.parse(storedUser));
+                    setToken(storedToken);
+                } catch (e) {
+                    localStorage.removeItem("user");
+                    localStorage.removeItem("token");
+                }
             }
         }
         setIsLoading(false);

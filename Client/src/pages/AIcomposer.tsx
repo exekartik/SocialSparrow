@@ -53,7 +53,7 @@ export default function AIcomposer() {
         body: JSON.stringify({
           prompt,
           tone: selectedTone,
-          generateImage: true,
+          generateImage: false,
         }),
       });
 
