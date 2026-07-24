@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { motion } from "motion/react";
 
 export type AnimationVariant = "grow" | "flipUp" | "fadeUp" | "fadeIn";
@@ -20,7 +20,7 @@ export default function ScrollReveal({
     className = "",
     once = true,
 }: ScrollRevealProps) {
-    const getVariants = () => {
+    const getVariants = (): any => {
         switch (variant) {
             case "grow":
                 return {
@@ -31,7 +31,7 @@ export default function ScrollReveal({
                         transition: {
                             duration,
                             delay,
-                            ease: [0.25, 0.1, 0.25, 1.0],
+                            ease: "easeInOut",
                         },
                     },
                 };
@@ -42,14 +42,14 @@ export default function ScrollReveal({
                         opacity: 0,
                         rotateX: -90,
                         transformPerspective: 2500,
-                        transformStyle: "preserve-3d" as const,
-                        backfaceVisibility: "hidden" as const,
+                        transformStyle: "preserve-3d",
+                        backfaceVisibility: "hidden",
                     },
                     visible: {
                         opacity: 1,
                         rotateX: 0,
                         transformPerspective: 2500,
-                        transformStyle: "preserve-3d" as const,
+                        transformStyle: "preserve-3d",
                         transition: {
                             duration,
                             delay,

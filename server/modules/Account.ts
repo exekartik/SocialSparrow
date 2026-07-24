@@ -1,7 +1,7 @@
 import mongoose, { Document, Model } from "mongoose";
 
 export interface IAccount extends Document {
-    user: mongoose.Schema.Types.ObjectId;
+    user: mongoose.Types.ObjectId;
     platform: "twitter" | "instagram" | "youtube" | "tiktok" | "facebook" | "facebook_page" | "linkedin_page" | "google_business";
     platformUserId?: string;
     accessToken?: string;

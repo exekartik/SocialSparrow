@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export interface MeteorsProps {
   number?: number;
@@ -6,7 +6,7 @@ export interface MeteorsProps {
 }
 
 export const Meteors = ({ number = 20, className = "" }: MeteorsProps) => {
-  const [meteorStyles, setMeteorStyles] = useState<React.CSSProperties[]>([]);
+  const [meteorStyles, setMeteorStyles] = useState<any[]>([]);
 
   useEffect(() => {
     const styles = [...new Array(number)].map(() => ({

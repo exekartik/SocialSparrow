@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Bird } from "lucide-react";
+import { useAuth } from "../../context/authContext";
 
 const footerLinks = {
     Product: ["Features", "How it works", "Pricing", "Changelog"],
@@ -8,6 +9,8 @@ const footerLinks = {
 };
 
 export default function Footer() {
+    const { isAuthenticated } = useAuth();
+
     return (
         <footer className="bg-[#18181c] border-t border-[#242429] text-zinc-300">
             <div className="max-w-6xl mx-auto px-5 sm:px-8 py-16">
@@ -54,8 +57,8 @@ export default function Footer() {
                         <a href="#" className="text-xs text-zinc-400 hover:text-white transition-colors">
                             Terms of Service
                         </a>
-                        <Link to="/login" className="text-xs text-orange-400 hover:text-orange-300 font-semibold transition-colors">
-                            Sign In
+                        <Link to={isAuthenticated ? "/dashboard" : "/login"} className="text-xs text-orange-400 hover:text-orange-300 font-semibold transition-colors">
+                            {isAuthenticated ? "Dashboard" : "Sign In"}
                         </Link>
                     </div>
                 </div>
@@ -63,4 +66,3 @@ export default function Footer() {
         </footer>
     );
 }
-

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { CheckCircleIcon, ChevronDownIcon } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import SpotlightCard from "../SpotlightCard";

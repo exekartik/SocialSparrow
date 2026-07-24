@@ -1,11 +1,11 @@
 import { Router } from "express";
+import { generateAuthUrl, syncAccounts } from "../controllers/SocialAuthController.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
-import { generateAuthUrl, syncAccounts } from "../controllers/SocialAuthController.js"
+const socialAuthRouter = Router();
 
-const router = Router()
+// Social OAuth Integration Routes
+socialAuthRouter.get("/auth/:platform", authMiddleware, generateAuthUrl);
+socialAuthRouter.get("/sync", authMiddleware, syncAccounts);
 
-router.get("/auth/:platform", generateAuthUrl)
-
-router.get("/sync", syncAccounts)
-
-export default router
+export default socialAuthRouter;

@@ -1,24 +1,51 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { MailIcon, LockIcon, ArrowRightIcon, User2Icon, Bird } from "lucide-react";
+import { MailIcon, LockIcon, ArrowRightIcon, User2Icon, Bird, Eye, EyeOff } from "lucide-react";
 import AutumnLeavesCanvas from "../components/AutumnLeavesCanvas";
 import TiltedCard from "../components/TiltedCard";
+import api from "../api/axios";
+import { useAuth } from "../context/authContext";
+
+import toast from "react-hot-toast";
 
 export default function Login() {
     const [loginState, setLoginState] = useState(true);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const { login: authLogin } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setTimeout(() => {
+        setError(null);
+
+        try {
+            const endpoint = loginState ? "/auth/login" : "/auth/register";
+            const payload = loginState ? { email, password } : { name, email, password };
+            
+            const res = await api.post(endpoint, payload);
+            const data = res.data;
+            const token = data.accessToken || data.token;
+
+            if (token) {
+                const userObj = data.user || { _id: "1", name: name || email.split("@")[0], email };
+                authLogin(userObj, token);
+                toast.success(loginState ? "Welcome back! Signed in successfully." : "Account created successfully!");
+                navigate("/dashboard");
+            }
+        } catch (err: any) {
+            console.error("Login Error:", err);
+            const errMsg = err?.response?.data?.message || err?.message || "Authentication failed. Please check your credentials.";
+            setError(errMsg);
+            toast.error(errMsg);
+        } finally {
             setLoading(false);
-            navigate("/dashboard");
-        }, 1000);
+        }
     };
 
     return (
@@ -64,6 +91,12 @@ export default function Login() {
                         </p>
                     </div>
 
+                    {error && (
+                        <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium text-center">
+                            {error}
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-4 text-xs">
                         {!loginState && (
                             <div>
@@ -102,13 +135,21 @@ export default function Login() {
                             <div className="relative">
                                 <LockIcon className="size-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
                                 <input 
-                                    type="password" 
+                                    type={showPassword ? "text" : "password"} 
                                     required 
                                     placeholder="••••••••" 
-                                    className="w-full pl-10 pr-4 py-2.5 bg-[#202025]/90 border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 
+                                    className="w-full pl-10 pr-10 py-2.5 bg-[#202025]/90 border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 
                                     value={password} 
                                     onChange={(e) => setPassword(e.target.value)} 
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none cursor-pointer"
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                >
+                                    {showPassword ? <EyeOff className="size-4 text-orange-400" /> : <Eye className="size-4" />}
+                                </button>
                             </div>
                         </div>
 
@@ -131,14 +172,14 @@ export default function Login() {
                         {loginState ? (
                             <>
                                 Don't have an account?{" "}
-                                <button onClick={() => setLoginState(false)} className="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
+                                <button onClick={() => { setError(null); setLoginState(false); }} className="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
                                     Create one free
                                 </button>
                             </>
                         ) : (
                             <>
                                 Already have an account?{" "}
-                                <button onClick={() => setLoginState(true)} className="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
+                                <button onClick={() => { setError(null); setLoginState(true); }} className="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
                                     Sign In
                                 </button>
                             </>

@@ -70,6 +70,7 @@ export const registerUser = async (
         // 6. Return response (excluding password and refresh token from the returned user object)
         res.status(201).json({
             message: "User registered successfully",
+            token: accessToken,
             accessToken,
             refreshToken, // Send the raw refresh token to the client
             user: {
@@ -136,6 +137,7 @@ export const loginUser = async (
 
         res.status(200).json({
             message: "Login successful",
+            token: accessToken,
             accessToken,
             refreshToken,
             user: {

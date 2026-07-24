@@ -1,19 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Calendar as CalendarIcon, 
   Clock, 
-  Plus, 
-  ChevronLeft, 
-  ChevronRight, 
   Share2, 
   Globe, 
   MessageSquare,
   Upload,
   Send,
-  Image as ImageIcon,
-  CheckCircle2
+  AlertCircle
 } from 'lucide-react';
 import SpecularButton from '../components/SpecularButton';
+import apiFetch from '../api';
 
 const platforms = [
   { id: 'twitter', name: 'Twitter / X', icon: Share2, color: 'text-orange-400' },
@@ -21,67 +18,87 @@ const platforms = [
   { id: 'instagram', name: 'Instagram', icon: MessageSquare, color: 'text-pink-400' },
 ];
 
-interface QueueItem {
-  id: number;
-  title: string;
-  platform: string;
-  time: string;
-  icon: any;
-  color: string;
-  status: 'Scheduled' | 'Published';
-}
+import toast from 'react-hot-toast';
+import CoolLoadingSpinner from '../components/CoolLoadingSpinner';
 
-const initialScheduledItems: QueueItem[] = [
-  { id: 1, title: 'Weekly SaaS Growth Masterclass Stream 🎙️', platform: 'Twitter / X', time: 'Today, 5:00 PM', icon: Share2, color: 'text-orange-400', status: 'Scheduled' },
-  { id: 2, title: 'How we scaled SocialSparrow to 10k users in 3 months', platform: 'LinkedIn', time: 'Tomorrow, 10:30 AM', icon: Globe, color: 'text-amber-400', status: 'Scheduled' },
-  { id: 3, title: 'New UI feature breakdown & dark mode walkthrough', platform: 'Instagram', time: 'Jul 24, 2:00 PM', icon: MessageSquare, color: 'text-pink-400', status: 'Scheduled' },
-];
-
-const Scheduler = () => {
+export default function Scheduler() {
   const [activeTab, setActiveTab] = useState<'all' | 'scheduled' | 'published'>('all');
   const [selectedPlatform, setSelectedPlatform] = useState('twitter');
   const [postText, setPostText] = useState('');
   const [date, setDate] = useState('2026-07-25');
   const [time, setTime] = useState('17:00');
-  const [mediaName, setMediaName] = useState<string | null>(null);
-  const [queue, setQueue] = useState<QueueItem[]>(initialScheduledItems);
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [dbPosts, setDbPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const MAX_CHARS = 280;
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setMediaName(e.target.files[0].name);
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const res = await apiFetch('/posts');
+      const fetched = Array.isArray(res) ? res : (res.data || []);
+      setDbPosts(fetched);
+    } catch (err) {
+      console.error('Fetch posts error:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSchedulePost = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setMediaFile(e.target.files[0]);
+      toast.success(`Attached media file: ${e.target.files[0].name}`);
+    }
+  };
+
+  const handleSchedulePost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!postText.trim()) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      const activePlatformObj = platforms.find(p => p.id === selectedPlatform) || platforms[0];
-      const newItem: QueueItem = {
-        id: Date.now(),
-        title: postText,
-        platform: activePlatformObj.name,
-        time: `${date} at ${time}`,
-        icon: activePlatformObj.icon,
-        color: activePlatformObj.color,
-        status: 'Scheduled',
-      };
+    setError(null);
 
-      setQueue([newItem, ...queue]);
+    try {
+      const formData = new FormData();
+      formData.append('content', postText);
+      formData.append('platforms', JSON.stringify([selectedPlatform]));
+      formData.append('scheduledFor', new Date(`${date}T${time}`).toISOString());
+      formData.append('status', 'scheduled');
+
+      if (mediaFile) {
+        formData.append('media', mediaFile);
+      }
+
+      await apiFetch('/posts/schedule', {
+        method: 'POST',
+        body: formData,
+      });
+
       setPostText('');
-      setMediaName(null);
+      setMediaFile(null);
+      toast.success("Post added to schedule queue!");
+      await fetchPosts();
+    } catch (err: any) {
+      console.error('Schedule Error:', err);
+      const errMsg = err?.message || 'Failed to schedule post';
+      setError(errMsg);
+      toast.error(errMsg);
+    } finally {
       setIsSubmitting(false);
-    }, 800);
+    }
   };
 
-  const filteredQueue = queue.filter(item => {
-    if (activeTab === 'scheduled') return item.status === 'Scheduled';
-    if (activeTab === 'published') return item.status === 'Published';
+  const filteredPosts = dbPosts.filter(item => {
+    if (activeTab === 'scheduled') return item.status === 'scheduled';
+    if (activeTab === 'published') return item.status === 'published';
     return true;
   });
 
@@ -98,6 +115,13 @@ const Scheduler = () => {
           <p className="text-xs md:text-sm text-zinc-400">Compose, attach media, and schedule posts across all your social channels.</p>
         </div>
       </div>
+
+      {error && (
+        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+          <AlertCircle className="w-4 h-4" />
+          <span>{error}</span>
+        </div>
+      )}
 
       {/* Main Composer Plate */}
       <div className="p-6 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] space-y-5 shadow-lg">
@@ -160,7 +184,7 @@ const Scheduler = () => {
               />
               <div className="flex items-center gap-2 text-xs text-zinc-400">
                 <Upload className="w-4 h-4 text-orange-400 shrink-0" />
-                <span>{mediaName ? `Attached: ${mediaName}` : 'Click to upload image or video'}</span>
+                <span>{mediaFile ? `Attached: ${mediaFile.name}` : 'Click to upload image or video'}</span>
               </div>
             </div>
 
@@ -200,7 +224,7 @@ const Scheduler = () => {
               intensity={1.3}
               type="submit"
               disabled={isSubmitting || !postText.trim()}
-              className="w-full justify-center py-3 font-semibold text-sm shadow-lg shadow-orange-500/20"
+              className="w-full justify-center py-3 font-semibold text-sm shadow-lg shadow-orange-500/20 cursor-pointer"
             >
               <Send className="w-4 h-4 text-orange-400" />
               <span>{isSubmitting ? 'Scheduling...' : 'Schedule Post'}</span>
@@ -231,39 +255,44 @@ const Scheduler = () => {
         </div>
 
         <div className="space-y-3">
-          {filteredQueue.map((item) => {
-            const Icon = item.icon;
-            return (
+          {loading ? (
+            <CoolLoadingSpinner text="Fetching Posts Calendar..." subtext="Syncing upcoming queue from backend..." />
+          ) : filteredPosts.length > 0 ? (
+            filteredPosts.map((item) => (
               <div 
-                key={item.id}
+                key={item._id}
                 className="p-4 rounded-xl bg-[#202025] border border-[#2c2c33] hover:border-orange-500/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all"
               >
                 <div className="flex items-start md:items-center gap-3.5 flex-1 min-w-0">
                   <div className="p-2.5 rounded-xl bg-[#2a2a30] shrink-0">
-                    <Icon className={`w-5 h-5 ${item.color}`} />
+                    <Share2 className="w-5 h-5 text-orange-400" />
                   </div>
                   <div className="min-w-0">
-                    <h4 className="text-xs font-semibold text-zinc-100 truncate">{item.title}</h4>
-                    <p className="text-[11px] text-zinc-400">{item.platform}</p>
+                    <h4 className="text-xs font-semibold text-zinc-100 truncate">{item.content}</h4>
+                    <p className="text-[11px] text-zinc-400">
+                      {Array.isArray(item.platforms) ? item.platforms.join(', ') : item.platform || 'Multi'}
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between md:justify-end gap-4 shrink-0">
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#282830] border border-[#32323a] text-xs text-zinc-300">
                     <Clock className="w-3.5 h-3.5 text-orange-400" />
-                    <span>{item.time}</span>
+                    <span>{new Date(item.scheduledFor).toLocaleString()}</span>
                   </div>
-                  <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold">
+                  <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold capitalize">
                     {item.status}
                   </span>
                 </div>
               </div>
-            );
-          })}
+            ))
+          ) : (
+            <div className="p-8 text-center text-zinc-500 text-xs">
+              No posts found for this filter.
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
-};
-
-export default Scheduler;
+}

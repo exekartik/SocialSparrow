@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './sidebar';
 import { Menu, Bell, Search } from 'lucide-react';
+import { useAuth } from '../context/authContext';
+import CoolLoadingSpinner from './CoolLoadingSpinner';
 
 const Layout: React.FC = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const location = useLocation();
+    const { isLoading } = useAuth();
 
     const getPageTitle = (pathname: string) => {
         switch (pathname) {
@@ -21,6 +24,10 @@ const Layout: React.FC = () => {
                 return 'SocialSparrow';
         }
     };
+
+    if (isLoading) {
+        return <CoolLoadingSpinner fullScreen text="Initializing Workspace..." subtext="Connecting to SocialSparrow backend..." />;
+    }
 
     return (
         <div className="flex h-screen w-full bg-[#121214] text-zinc-100 font-sans overflow-hidden">
@@ -80,4 +87,3 @@ const Layout: React.FC = () => {
 };
 
 export default Layout;
-

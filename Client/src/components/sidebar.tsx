@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import SpecularButton from './SpecularButton';
 
+import toast from 'react-hot-toast';
+
 interface SidebarProps {
   isOpen?: boolean;
   setIsOpen?: (open: boolean) => void;
@@ -117,7 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, setIsOpen, setisOpen 
       </nav>
 
       {/* Footer Profile badge / workspace info */}
-      <div className="p-4 border-t border-[#242429]">
+      <div className="p-4 border-t border-[#242429] space-y-2">
         <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#202025] border border-[#2c2c33]">
           <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center justify-center font-bold text-xs">
             SS
@@ -127,6 +129,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, setIsOpen, setisOpen 
             <p className="text-[10px] text-orange-400 font-medium truncate">Pro Plan</p>
           </div>
         </div>
+        <button
+          onClick={() => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            toast.success("Signed out of workspace");
+            navigate('/login');
+          }}
+          className="w-full text-center py-2 text-xs font-semibold text-zinc-400 hover:text-red-400 transition-colors cursor-pointer"
+        >
+          Sign Out
+        </button>
       </div>
     </aside>
   );

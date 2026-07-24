@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { ArrowRightIcon, Bird } from "lucide-react";
+import { useAuth } from "../../context/authContext";
 
 export default function Navbar() {
-    const { user } = { user: false };
+    const { isAuthenticated } = useAuth();
 
     return (
         <nav className="sticky top-0 z-50 bg-[#18181c]/80 backdrop-blur-lg border-b border-[#242429]">
@@ -27,9 +28,9 @@ export default function Navbar() {
                     </a>
                 </div>
 
-                {user ? (
+                {isAuthenticated ? (
                     <Link to="/dashboard" className="flex items-center gap-1.5 text-xs font-semibold bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl shadow-md shadow-orange-500/20 transition-colors">
-                        Go to Dashboard <ArrowRightIcon className="size-3.5" />
+                        Dashboard <ArrowRightIcon className="size-3.5" />
                     </Link>
                 ) : (
                     <div className="flex items-center gap-3">
@@ -45,4 +46,3 @@ export default function Navbar() {
         </nav>
     );
 }
-
