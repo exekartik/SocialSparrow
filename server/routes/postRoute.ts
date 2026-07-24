@@ -4,8 +4,6 @@ import { upload } from "../config/multer.js";
 import {
     genreatepost,
     getGenerations,
-    getGenerated,
-    getGenration,
     schedulePost,
     getPosts,
     sharePost
@@ -16,7 +14,6 @@ const postRoute = Router();
 // AI Generation Routes
 postRoute.post("/generate", authMiddleware, genreatepost);
 postRoute.get("/generations", authMiddleware, getGenerations);
-postRoute.get("/generation", authMiddleware, getGenerated);
 
 // Post Management & Scheduling Routes (supports optional file uploads via multer)
 postRoute.post("/schedule", authMiddleware, upload.single("media"), schedulePost);

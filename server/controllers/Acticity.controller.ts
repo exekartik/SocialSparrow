@@ -26,6 +26,27 @@ export const getActivityLogs = async (req: AuthRequest, res: Response): Promise<
 };
 
 /**
+ * Delete an activity log entry
+ * DELETE /api/activity/:id
+ */
+export const deleteActivityLog = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        await ActivityLog.findOneAndDelete({ _id: id, user: req.user._id });
+        res.status(200).json({
+            success: true,
+            message: "Activity log deleted successfully"
+        });
+    } catch (error: any) {
+        console.error("Delete Activity Log Error:", error);
+        res.status(500).json({
+            success: false,
+            message: error?.message || "Failed to delete activity log"
+        });
+    }
+};
+
+/**
  * Utility function to log an activity internally in other controllers
  */
 export const logActivity = async (
@@ -47,4 +68,5 @@ export const logActivity = async (
         console.error("Internal Log Activity Error:", error);
     }
 };
+
 export default getActivityLogs;

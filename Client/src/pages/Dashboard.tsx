@@ -6,11 +6,13 @@ import {
   ArrowUpRight, 
   Clock, 
   CheckCircle2, 
-  Calendar 
+  Calendar,
+  Trash2
 } from 'lucide-react';
 import SpecularButton from '../components/SpecularButton';
 import { useNavigate } from 'react-router-dom';
 import apiFetch from '../api';
+import toast from 'react-hot-toast';
 
 import CoolLoadingSpinner from '../components/CoolLoadingSpinner';
 
@@ -59,6 +61,17 @@ export default function Dashboard() {
 
     loadDashboardData();
   }, []);
+
+  const handleDeleteActivity = async (id: string) => {
+    try {
+      await apiFetch(`/activity/${id}`, { method: 'DELETE' });
+      setActivities(prev => prev.filter(act => act._id !== id));
+      toast.success("Activity item deleted");
+    } catch (err: any) {
+      console.error("Delete activity error:", err);
+      toast.error(err?.message || "Failed to delete activity item");
+    }
+  };
 
   if (loading) {
     return <CoolLoadingSpinner text="Syncing Dashboard Metrics..." subtext="Fetching recent activities and connected platforms..." />;
@@ -174,9 +187,18 @@ export default function Dashboard() {
                     <h4 className="text-sm font-semibold text-zinc-100 truncate">{act.description}</h4>
                   </div>
 
-                  <div className="flex items-center gap-1 text-xs text-zinc-400">
-                    <Clock className="w-3.5 h-3.5 text-zinc-500" />
-                    <span>{new Date(act.createdAt).toLocaleDateString()}</span>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-1 text-xs text-zinc-400">
+                      <Clock className="w-3.5 h-3.5 text-zinc-500" />
+                      <span>{new Date(act.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteActivity(act._id)}
+                      className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-[#2c2c33] transition-colors cursor-pointer"
+                      title="Delete activity log"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               ))
