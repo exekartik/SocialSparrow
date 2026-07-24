@@ -6,7 +6,8 @@ import {
     getGenerations,
     schedulePost,
     getPosts,
-    sharePost
+    sharePost,
+    deletePost
 } from "../controllers/postController.js";
 
 const postRoute = Router();
@@ -20,5 +21,6 @@ postRoute.post("/schedule", authMiddleware, upload.single("media"), schedulePost
 postRoute.post("/", authMiddleware, upload.single("media"), schedulePost);
 postRoute.get("/", authMiddleware, getPosts);
 postRoute.post("/share/:id", authMiddleware, sharePost);
+postRoute.delete("/:id", authMiddleware, deletePost);
 
 export default postRoute;

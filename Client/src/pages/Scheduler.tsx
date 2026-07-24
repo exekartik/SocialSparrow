@@ -7,7 +7,8 @@ import {
   MessageSquare,
   Upload,
   Send,
-  AlertCircle
+  AlertCircle,
+  Trash2
 } from 'lucide-react';
 import SpecularButton from '../components/SpecularButton';
 import apiFetch from '../api';
@@ -56,6 +57,17 @@ export default function Scheduler() {
     if (e.target.files && e.target.files[0]) {
       setMediaFile(e.target.files[0]);
       toast.success(`Attached media file: ${e.target.files[0].name}`);
+    }
+  };
+
+  const handleDeletePost = async (id: string) => {
+    try {
+      await apiFetch(`/posts/${id}`, { method: 'DELETE' });
+      setDbPosts(prev => prev.filter(post => post._id !== id));
+      toast.success("Post deleted successfully");
+    } catch (err: any) {
+      console.error("Delete post error:", err);
+      toast.error(err?.message || "Failed to delete post");
     }
   };
 
@@ -275,7 +287,7 @@ export default function Scheduler() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between md:justify-end gap-4 shrink-0">
+                <div className="flex items-center justify-between md:justify-end gap-3 shrink-0">
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#282830] border border-[#32323a] text-xs text-zinc-300">
                     <Clock className="w-3.5 h-3.5 text-orange-400" />
                     <span>{new Date(item.scheduledFor).toLocaleString()}</span>
@@ -283,6 +295,13 @@ export default function Scheduler() {
                   <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold capitalize">
                     {item.status}
                   </span>
+                  <button
+                    onClick={() => handleDeletePost(item._id)}
+                    className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-[#2c2c33] transition-colors cursor-pointer ml-1"
+                    title="Delete post"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             ))

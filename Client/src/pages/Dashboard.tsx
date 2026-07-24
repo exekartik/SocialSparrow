@@ -73,6 +73,17 @@ export default function Dashboard() {
     }
   };
 
+  const handleDeletePost = async (id: string) => {
+    try {
+      await apiFetch(`/posts/${id}`, { method: 'DELETE' });
+      setPosts(prev => prev.filter(post => post._id !== id));
+      toast.success("Post deleted from queue");
+    } catch (err: any) {
+      console.error("Delete post error:", err);
+      toast.error(err?.message || "Failed to delete post");
+    }
+  };
+
   if (loading) {
     return <CoolLoadingSpinner text="Syncing Dashboard Metrics..." subtext="Fetching recent activities and connected platforms..." />;
   }
@@ -218,9 +229,18 @@ export default function Dashboard() {
                     </div>
                     <h4 className="text-sm font-semibold text-zinc-100 truncate">{post.content}</h4>
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-zinc-400">
-                    <Clock className="w-3.5 h-3.5 text-zinc-500" />
-                    <span>{new Date(post.scheduledFor || post.createdAt).toLocaleDateString()}</span>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-1 text-xs text-zinc-400">
+                      <Clock className="w-3.5 h-3.5 text-zinc-500" />
+                      <span>{new Date(post.scheduledFor || post.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <button
+                      onClick={() => handleDeletePost(post._id)}
+                      className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-[#2c2c33] transition-colors cursor-pointer"
+                      title="Delete post"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               ))

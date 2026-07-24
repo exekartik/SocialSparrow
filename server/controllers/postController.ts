@@ -88,7 +88,7 @@ JSON Format Example:
   "imagePrompt": "A highly detailed, 3D render scene description for image generation"
 }`;
 
-        const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+        const candidateModels = ["gemini-3.6-flash", "gemini-3.5-flash"];
         
         for (const model of candidateModels) {
             try {
@@ -369,5 +369,37 @@ export const sharePost = async (req: AuthRequest, res: Response): Promise<void> 
     } catch (error: any) {
         console.error("Share Post Error:", error);
         res.status(500).json({ success: false, message: "Failed to publish post" });
+    }
+};
+
+/**
+ * Delete a Post
+ * DELETE /api/posts/:id
+ */
+export const deletePost = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const post = await Post.findOneAndDelete({ _id: id, user: req.user._id });
+
+        if (!post) {
+            res.status(404).json({ message: "Post not found" });
+            return;
+        }
+
+        await logActivity(
+            req.user._id,
+            "delete",
+            `Deleted post: ${post.content.substring(0, 30)}...`,
+            post._id
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Post deleted successfully"
+        });
+
+    } catch (error: any) {
+        console.error("Delete Post Error:", error);
+        res.status(500).json({ success: false, message: "Failed to delete post" });
     }
 };
