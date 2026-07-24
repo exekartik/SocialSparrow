@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MailIcon, LockIcon, ArrowRightIcon, User2Icon, Bird, Eye, EyeOff } from "lucide-react";
 import AutumnLeavesCanvas from "../components/AutumnLeavesCanvas";
-import TiltedCard from "../components/TiltedCard";
 import api from "../api/axios";
 import { useAuth } from "../context/authContext";
 
@@ -69,14 +68,7 @@ export default function Login() {
 
             {/* Center Login Glassmorphism Card */}
             <div className="relative z-20 w-full max-w-md">
-                <TiltedCard
-                    rotateAmplitude={8}
-                    scaleOnHover={1.02}
-                    showMobileWarning={false}
-                    showTooltip={false}
-                >
-                    <div className="relative bg-[#1a1a1e]/85 backdrop-blur-xl border border-[#2c2c33] hover:border-orange-500/30 rounded-2xl shadow-2xl shadow-orange-950/40 p-8 transition-all duration-300">
-                    
+                <div className="relative bg-[#1a1a1e]/90 backdrop-blur-xl border border-[#2c2c33] hover:border-orange-500/30 rounded-2xl shadow-2xl shadow-orange-950/40 p-8 transition-all duration-300">
                     <div className="flex flex-col items-center mb-8">
                         <Link to="/" className="flex items-center gap-3 group mb-2">
                             <div className="p-2.5 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 text-white shadow-lg shadow-orange-500/25 group-hover:scale-105 transition-transform duration-300">
@@ -97,7 +89,7 @@ export default function Login() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+                    <form onSubmit={handleSubmit} autoComplete="on" className="space-y-4 text-xs">
                         {!loginState && (
                             <div>
                                 <label className="block mb-1.5 font-medium text-zinc-300">Name</label>
@@ -106,6 +98,7 @@ export default function Login() {
                                     <input 
                                         type="text" 
                                         required 
+                                        autoComplete="name"
                                         placeholder="Enter your name" 
                                         className="w-full pl-10 pr-4 py-2.5 bg-[#202025]/90 border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 
                                         value={name} 
@@ -122,6 +115,7 @@ export default function Login() {
                                 <input 
                                     type="email" 
                                     required 
+                                    autoComplete="username"
                                     placeholder="you@company.com" 
                                     className="w-full pl-10 pr-4 py-2.5 bg-[#202025]/90 border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 
                                     value={email} 
@@ -137,6 +131,7 @@ export default function Login() {
                                 <input 
                                     type={showPassword ? "text" : "password"} 
                                     required 
+                                    autoComplete={loginState ? "current-password" : "new-password"}
                                     placeholder="••••••••" 
                                     className="w-full pl-10 pr-10 py-2.5 bg-[#202025]/90 border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 
                                     value={password} 
@@ -144,8 +139,12 @@ export default function Login() {
                                 />
                                 <button
                                     type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none cursor-pointer"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setShowPassword((prev) => !prev);
+                                    }}
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 z-30 p-1 text-zinc-400 hover:text-orange-400 transition-colors focus:outline-none cursor-pointer"
                                     aria-label={showPassword ? "Hide password" : "Show password"}
                                 >
                                     {showPassword ? <EyeOff className="size-4 text-orange-400" /> : <Eye className="size-4" />}
@@ -172,22 +171,21 @@ export default function Login() {
                         {loginState ? (
                             <>
                                 Don't have an account?{" "}
-                                <button onClick={() => { setError(null); setLoginState(false); }} className="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
+                                <button type="button" onClick={() => { setError(null); setLoginState(false); }} className="text-orange-400 hover:text-orange-300 font-semibold transition-colors cursor-pointer">
                                     Create one free
                                 </button>
                             </>
                         ) : (
                             <>
                                 Already have an account?{" "}
-                                <button onClick={() => { setError(null); setLoginState(true); }} className="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
+                                <button type="button" onClick={() => { setError(null); setLoginState(true); }} className="text-orange-400 hover:text-orange-300 font-semibold transition-colors cursor-pointer">
                                     Sign In
                                 </button>
                             </>
                         )}
                     </div>
                 </div>
-            </TiltedCard>
+            </div>
         </div>
-    </div>
-);
+    );
 }

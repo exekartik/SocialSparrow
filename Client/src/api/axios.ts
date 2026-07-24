@@ -1,8 +1,18 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
-const baseURL = rawBaseUrl.endsWith("/api") ? rawBaseUrl : `${rawBaseUrl.replace(/\/$/, "")}/api`;
+const getBaseUrl = () => {
+    if (import.meta.env.VITE_API_BASE_URL) {
+        const url = import.meta.env.VITE_API_BASE_URL;
+        return url.endsWith("/api") ? url : `${url.replace(/\/$/, "")}/api`;
+    }
+    if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+        return "http://localhost:3000/api";
+    }
+    return "/api";
+};
+
+const baseURL = getBaseUrl();
 
 const api = axios.create({
     baseURL,
