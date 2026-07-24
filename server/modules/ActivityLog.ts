@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IActivityLog extends Document {
     user: mongoose.Types.ObjectId;
-    actionType: "post" | "comment" | "share" | "account_connect" | "account_disconnect" | "generate" | "schedule";
+    actionType: "post" | "comment" | "share" | "account_connect" | "account_disconnect" | "generate" | "schedule" | "delete";
     description: string;
     relatedPost?: mongoose.Types.ObjectId;
     platform?: string;
@@ -15,7 +15,7 @@ const activityLogSchema = new Schema<IActivityLog>({
     actionType: { 
         type: String, 
         required: true, 
-        enum: ["post", "comment", "share", "account_connect", "account_disconnect", "generate", "schedule"] 
+        enum: ["post", "comment", "share", "account_connect", "account_disconnect", "generate", "schedule", "delete"] 
     },
     description: { type: String, required: true },  
     relatedPost: { type: Schema.Types.ObjectId, ref: "Post" },

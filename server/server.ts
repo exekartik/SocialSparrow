@@ -12,7 +12,9 @@ import { initScheduler } from "./services/SchedulerService.js";
 const app = express();
 
 // Connect Database
-await connectDB();
+connectDB().catch((err) => {
+    console.error("Initial database connection error:", err.message);
+});
 
 // Initialize scheduler service
 initScheduler();
@@ -37,10 +39,10 @@ app.use("/api/activity", activityRouter);
 // Global Error Handler
 app.use(
     (err: any, _req: Request, res: Response, _next: NextFunction) => {
-        console.error(err);
-        res.status(500).send(
-            err?.response?.data?.message || err?.message
-        );
+        console.error("Global API Error:", err);
+        res.status(500).json({
+            message: err?.response?.data?.message || err?.message || "Internal Server Error"
+        });
     }
 );
 

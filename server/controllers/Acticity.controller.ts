@@ -51,7 +51,7 @@ export const deleteActivityLog = async (req: AuthRequest, res: Response): Promis
  */
 export const logActivity = async (
     userId: string,
-    actionType: "post" | "comment" | "share" | "account_connect" | "account_disconnect" | "generate" | "schedule",
+    actionType: "post" | "comment" | "share" | "account_connect" | "account_disconnect" | "generate" | "schedule" | "delete",
     description: string,
     relatedPostId?: any,
     platform?: string
