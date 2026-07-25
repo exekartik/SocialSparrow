@@ -61,8 +61,8 @@ if (process.env.NODE_ENV !== "production") {
 
 const port = process.env.PORT || 3000;
 
-// ─── Health Check ─────────────────────────────────────────────────────────────
-app.get("/", (_req: Request, res: Response) => {
+// ─── Health Check (handles both / and /api) ──────────────────────────────────
+app.get(["/", "/api"], (_req: Request, res: Response) => {
     res.json({ status: "ok", message: "SocialSparrow API Server is Live!" });
 });
 
@@ -73,11 +73,15 @@ app.use("/api/accounts", accountRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/activity", activityRouter);
 
+// ─── 404 Fallback Handler (ensures serverless never hangs) ────────────────────
+app.use((_req: Request, res: Response) => {
+    res.status(404).json({ message: "API Route not found" });
+});
+
 // ─── Global Error Handler ─────────────────────────────────────────────────────
 app.use(
     (err: any, _req: Request, res: Response, _next: NextFunction) => {
         console.error("Global API Error:", err);
-        // Don't send CORS error message verbatim to client
         const message = err?.response?.data?.message || err?.message || "Internal Server Error";
         const status = err?.status || err?.statusCode || 500;
         res.status(status).json({ message });
