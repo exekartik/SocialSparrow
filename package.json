@@ -1,0 +1,31 @@
+{
+  "name": "social-sparrow-root",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "cd server && npm install && npm run build && cd ../Client && npm install && npm run build",
+    "clear-db": "cd server && npm run clear-db"
+  },
+  "dependencies": {
+    "@google/genai": "^2.13.0",
+    "@types/multer": "^2.2.0",
+    "@zernio/node": "^0.2.416",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.10.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.8.0",
+    "multer": "^2.2.0",
+    "node-cron": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
+  }
+}
