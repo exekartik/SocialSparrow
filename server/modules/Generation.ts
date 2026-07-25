@@ -20,5 +20,5 @@ const generationSchema = new Schema<IGeneration>({
     tone: { type: String, default: "Professional" }
 }, { timestamps: true });
 
-export const Generation = mongoose.model<IGeneration>("Generation", generationSchema);
+export const Generation = mongoose.models.Generation || mongoose.model<IGeneration>("Generation", generationSchema);
 export default Generation;

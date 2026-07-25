@@ -307,7 +307,6 @@ userSchema.methods.comparePassword = async function (
    User.findById()
 =========================================================== */
 
-export const User: Model<IUser> = mongoose.model<IUser>(
-    "User",
-    userSchema
-);
+export const User: Model<IUser> =
+    (mongoose.models.User as Model<IUser>) ||
+    mongoose.model<IUser>("User", userSchema);

@@ -30,4 +30,6 @@ const accountSchema = new mongoose.Schema<IAccount>({
 
 accountSchema.index({ user: 1, zernioAccountId: 1 }, { unique: true });
 
-export const Account: Model<IAccount> = mongoose.model<IAccount>("Account", accountSchema);
+export const Account: Model<IAccount> =
+    (mongoose.models.Account as Model<IAccount>) ||
+    mongoose.model<IAccount>("Account", accountSchema);
