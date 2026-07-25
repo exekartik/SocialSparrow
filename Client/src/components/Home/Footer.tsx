@@ -35,19 +35,37 @@ export default function Footer() {
                         <div key={category}>
                             <div className="text-xs font-bold uppercase tracking-wider mb-4 text-orange-400">{category}</div>
                             <ul className="space-y-2">
-                                {links.map((link) => (
-                                    <li key={link}>
-                                        {link === "About" ? (
-                                            <Link to="/about" onClick={() => scrollTo(0, 0)} className="text-xs text-zinc-400 hover:text-white transition-colors">
-                                                {link}
-                                            </Link>
-                                        ) : (
-                                            <a href="#" className="text-xs text-zinc-400 hover:text-white transition-colors">
-                                                {link}
-                                            </a>
-                                        )}
-                                    </li>
-                                ))}
+                                {links.map((link) => {
+                                    const isHash = ["Features", "How it works", "Pricing"].includes(link);
+                                    const pathMap: Record<string, string> = {
+                                        "Features": "/#features",
+                                        "How it works": "/#how-it-works",
+                                        "Pricing": "/#pricing",
+                                        "Changelog": "/changelog",
+                                        "About": "/about",
+                                        "Blog": "/blog",
+                                        "Careers": "/careers",
+                                        "Press": "/press",
+                                        "Privacy": "/privacy",
+                                        "Terms": "/terms",
+                                        "Security": "/security",
+                                        "Cookies": "/cookies"
+                                    };
+                                    const path = pathMap[link] || "#";
+                                    return (
+                                        <li key={link}>
+                                            {isHash ? (
+                                                <a href={path} className="text-xs text-zinc-400 hover:text-white transition-colors">
+                                                    {link}
+                                                </a>
+                                            ) : (
+                                                <Link to={path} onClick={() => scrollTo(0, 0)} className="text-xs text-zinc-400 hover:text-white transition-colors">
+                                                    {link}
+                                                </Link>
+                                            )}
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </div>
                     ))}
@@ -57,12 +75,12 @@ export default function Footer() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-[#242429]">
                     <p className="text-xs text-zinc-500">© {new Date().getFullYear()} SocialSparrow. All rights reserved.</p>
                     <div className="flex items-center gap-6">
-                        <a href="#" className="text-xs text-zinc-400 hover:text-white transition-colors">
+                        <Link to="/privacy" onClick={() => scrollTo(0, 0)} className="text-xs text-zinc-400 hover:text-white transition-colors">
                             Privacy Policy
-                        </a>
-                        <a href="#" className="text-xs text-zinc-400 hover:text-white transition-colors">
+                        </Link>
+                        <Link to="/terms" onClick={() => scrollTo(0, 0)} className="text-xs text-zinc-400 hover:text-white transition-colors">
                             Terms of Service
-                        </a>
+                        </Link>
                         <Link to={isAuthenticated ? "/dashboard" : "/login"} className="text-xs text-orange-400 hover:text-orange-300 font-semibold transition-colors">
                             {isAuthenticated ? "Dashboard" : "Sign In"}
                         </Link>

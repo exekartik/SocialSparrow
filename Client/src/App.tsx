@@ -3,6 +3,14 @@ import { Toaster } from "react-hot-toast";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import About from "./pages/About";
+import Changelog from "./pages/Changelog";
+import Blog from "./pages/Blog";
+import Careers from "./pages/Careers";
+import Press from "./pages/Press";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Security from "./pages/Security";
+import Cookies from "./pages/Cookies";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Account from "./pages/Account";
@@ -54,6 +62,14 @@ export default function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/changelog" element={<Changelog />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/careers" element={<Careers />} />
+                <Route path="/press" element={<Press />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/security" element={<Security />} />
+                <Route path="/cookies" element={<Cookies />} />
                 <Route path="/login" element={<Login />} />
                 <Route element={<ProtectedLayout />}>
                     <Route path="/dashboard" element={<Dashboard />} />
