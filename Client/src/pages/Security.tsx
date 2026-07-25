@@ -2,6 +2,7 @@ import { ShieldCheck, Key, Lock, Server, Mail } from "lucide-react";
 import Navbar from "../components/Home/Navbar";
 import Footer from "../components/Home/Footer";
 import ScrollReveal from "../components/ScrollReveal";
+import SpotlightCard from "../components/SpotlightCard";
 
 const securityFeatures = [
     {
@@ -67,7 +68,7 @@ export default function Security() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {securityFeatures.map((f, idx) => (
                             <ScrollReveal key={f.title} variant="fadeUp" delay={0.1 * (idx + 1)}>
-                                <div className="p-8 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] hover:border-orange-500/20 transition-all duration-300 flex gap-4">
+                                <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.15)" className="p-8 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] hover:border-orange-500/20 transition-all duration-300 flex gap-4">
                                     <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-xl w-fit h-fit text-orange-500 shrink-0">
                                         {f.icon}
                                     </div>
@@ -75,7 +76,7 @@ export default function Security() {
                                         <h3 className="font-sans font-bold text-lg text-white mb-2">{f.title}</h3>
                                         <p className="text-zinc-400 text-sm leading-relaxed">{f.desc}</p>
                                     </div>
-                                </div>
+                                </SpotlightCard>
                             </ScrollReveal>
                         ))}
                     </div>

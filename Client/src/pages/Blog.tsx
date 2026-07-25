@@ -2,6 +2,7 @@ import { Sparkles, ArrowRight } from "lucide-react";
 import Navbar from "../components/Home/Navbar";
 import Footer from "../components/Home/Footer";
 import ScrollReveal from "../components/ScrollReveal";
+import SpotlightCard from "../components/SpotlightCard";
 
 const featuredPost = {
     title: "10 AI Prompts That Will Write Your Social Media Copy For The Next Month",
@@ -76,7 +77,7 @@ export default function Blog() {
 
                     {/* Featured Post */}
                     <ScrollReveal variant="flipUp" delay={0.2} duration={0.8} className="mb-16">
-                        <div className="rounded-3xl overflow-hidden bg-[#1c1c20] border border-[#2c2c33] hover:border-orange-500/30 transition-all duration-300 shadow-2xl grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 sm:p-8">
+                        <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.25)" className="rounded-3xl overflow-hidden bg-[#1c1c20] border border-[#2c2c33] hover:border-orange-500/30 transition-all duration-300 shadow-2xl grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 sm:p-8">
                             <div className="h-64 sm:h-80 lg:h-full rounded-2xl overflow-hidden relative">
                                 <img
                                     src={featuredPost.image}
@@ -115,14 +116,14 @@ export default function Blog() {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </SpotlightCard>
                     </ScrollReveal>
 
                     {/* Posts Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {blogPosts.map((post, idx) => (
                             <ScrollReveal key={post.title} variant="fadeUp" delay={0.1 * (idx + 1)}>
-                                <div className="rounded-2xl overflow-hidden bg-[#1c1c20] border border-[#2c2c33] hover:border-orange-500/20 hover:-translate-y-1 transition-all duration-300 shadow-lg flex flex-col h-full group">
+                                <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.15)" className="rounded-2xl overflow-hidden bg-[#1c1c20] border border-[#2c2c33] hover:border-orange-500/20 hover:-translate-y-1 transition-all duration-300 shadow-lg flex flex-col h-full group">
                                     <div className="h-48 overflow-hidden relative">
                                         <img
                                             src={post.image}
@@ -150,7 +151,7 @@ export default function Blog() {
                                             <div className="text-[9px] text-zinc-500">{post.readTime}</div>
                                         </div>
                                     </div>
-                                </div>
+                                </SpotlightCard>
                             </ScrollReveal>
                         ))}
                     </div>

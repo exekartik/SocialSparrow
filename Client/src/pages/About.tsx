@@ -15,6 +15,7 @@ import Footer from "../components/Home/Footer";
 import SpecularButton from "../components/SpecularButton";
 import TiltedCard from "../components/TiltedCard";
 import ScrollReveal from "../components/ScrollReveal";
+import SpotlightCard from "../components/SpotlightCard";
 
 export default function About() {
     return (
@@ -122,7 +123,7 @@ export default function About() {
                             }
                         ].map((s, idx) => (
                             <ScrollReveal key={s.title} variant="fadeUp" delay={0.1 * (idx + 1)}>
-                                <div className="p-8 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] hover:border-orange-500/20 transition-all duration-300 group relative">
+                                <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.2)" className="p-8 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] hover:border-orange-500/20 transition-all duration-300 group relative">
                                     <div className="absolute top-4 right-6 text-6xl font-black text-zinc-800/30 group-hover:text-orange-500/10 transition-colors select-none font-sans">
                                         {s.step}
                                     </div>
@@ -131,7 +132,7 @@ export default function About() {
                                     </div>
                                     <h3 className="font-sans font-bold text-xl text-white mb-3">{s.title}</h3>
                                     <p className="text-zinc-400 text-sm leading-relaxed">{s.desc}</p>
-                                </div>
+                                </SpotlightCard>
                             </ScrollReveal>
                         ))}
                     </div>
@@ -176,7 +177,7 @@ export default function About() {
                             }
                         ].map((item, idx) => (
                             <ScrollReveal key={item.segment} variant="grow" delay={0.05 * (idx + 1)}>
-                                <div className="p-6 rounded-2xl bg-[#1c1c20] border border-[#2c2c33] flex items-start gap-4">
+                                <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.15)" className="p-6 rounded-2xl bg-[#1c1c20] border border-[#2c2c33] flex items-start gap-4 hover:border-orange-500/20 transition-all duration-300">
                                     <div className="p-2.5 bg-zinc-800/50 border border-[#2c2c33] rounded-xl text-orange-400 shrink-0">
                                         {item.icon}
                                     </div>
@@ -184,7 +185,7 @@ export default function About() {
                                         <h4 className="font-sans font-bold text-base text-white">{item.segment}</h4>
                                         <p className="text-zinc-400 text-sm mt-1.5 leading-relaxed">{item.pain}</p>
                                     </div>
-                                </div>
+                                </SpotlightCard>
                             </ScrollReveal>
                         ))}
                     </div>
@@ -229,7 +230,7 @@ export default function About() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-sm">
                         <ScrollReveal variant="fadeUp" delay={0.2}>
-                            <div className="space-y-2">
+                            <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.15)" className="p-6 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] hover:border-orange-500/20 transition-all duration-300 space-y-2">
                                 <div className="flex items-center gap-2 font-bold text-white">
                                     <CheckCircle2 className="size-4 text-orange-500" />
                                     <span>AI-First, Not AI-Bolted-On</span>
@@ -237,10 +238,10 @@ export default function About() {
                                 <p className="text-zinc-400 leading-relaxed">
                                     We designed our AI Composer natively. Instead of a generic sidebar chatbot, our tool actively pre-fills templates, matches scheduling layouts, and saves you time in a single click.
                                 </p>
-                            </div>
+                            </SpotlightCard>
                         </ScrollReveal>
                         <ScrollReveal variant="fadeUp" delay={0.3}>
-                            <div className="space-y-2">
+                            <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.15)" className="p-6 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] hover:border-orange-500/20 transition-all duration-300 space-y-2">
                                 <div className="flex items-center gap-2 font-bold text-white">
                                     <CheckCircle2 className="size-4 text-orange-500" />
                                     <span>Built by Practitioners</span>
@@ -248,7 +249,7 @@ export default function About() {
                                 <p className="text-zinc-400 leading-relaxed">
                                     We didn't build a generic enterprise scheduler. We built the tool we wanted to use ourselves: lightning fast, intuitive, and focused purely on speed and execution.
                                 </p>
-                            </div>
+                            </SpotlightCard>
                         </ScrollReveal>
                     </div>
                 </div>

@@ -2,6 +2,7 @@ import { Sparkles, Calendar } from "lucide-react";
 import Navbar from "../components/Home/Navbar";
 import Footer from "../components/Home/Footer";
 import ScrollReveal from "../components/ScrollReveal";
+import SpotlightCard from "../components/SpotlightCard";
 
 const changelogData = [
     {
@@ -90,7 +91,7 @@ export default function Changelog() {
                                     </div>
 
                                     {/* Version Card */}
-                                    <div className="p-6 sm:p-8 rounded-2xl bg-[#1c1c20] border border-[#2c2c33] hover:border-orange-500/20 transition-all duration-300">
+                                    <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.15)" className="p-6 sm:p-8 rounded-2xl bg-[#1c1c20] border border-[#2c2c33] hover:border-orange-500/20 transition-all duration-300">
                                         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                                             <div className="flex items-center gap-3">
                                                 <span className="font-sans font-black text-xl text-white">{item.version}</span>
@@ -127,7 +128,7 @@ export default function Changelog() {
                                                 </li>
                                             ))}
                                         </ul>
-                                    </div>
+                                    </SpotlightCard>
                                 </div>
                             </ScrollReveal>
                         ))}

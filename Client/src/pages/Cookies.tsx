@@ -1,6 +1,7 @@
 import Navbar from "../components/Home/Navbar";
 import Footer from "../components/Home/Footer";
 import ScrollReveal from "../components/ScrollReveal";
+import SpotlightCard from "../components/SpotlightCard";
 
 export default function Cookies() {
     return (
@@ -13,9 +14,9 @@ export default function Cookies() {
             <section className="relative pt-24 pb-20">
                 <div className="max-w-3xl mx-auto px-5 sm:px-8">
                     {/* Legal Notice */}
-                    <div className="p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs mb-10 text-center">
+                    <SpotlightCard spotlightColor="rgba(249, 115, 22, 0.25)" className="p-4 rounded-xl bg-[#1c1c20]/50 border border-orange-500/20 text-orange-400 text-xs mb-10 text-center">
                         ⚠️ <strong>Disclaimer:</strong> This Cookie Policy is a mock template only and must be reviewed by legal counsel before launch.
-                    </div>
+                    </SpotlightCard>
 
                     <ScrollReveal variant="fadeUp" delay={0.1}>
                         <h1 className="font-sans font-black text-4xl text-white tracking-tight mb-2">Cookie Policy</h1>

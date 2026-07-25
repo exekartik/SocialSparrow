@@ -2,6 +2,7 @@ import { Sparkles, MapPin, Briefcase, Heart, Globe } from "lucide-react";
 import Navbar from "../components/Home/Navbar";
 import Footer from "../components/Home/Footer";
 import ScrollReveal from "../components/ScrollReveal";
+import SpotlightCard from "../components/SpotlightCard";
 
 const values = [
     {
@@ -94,13 +95,13 @@ export default function Careers() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {values.map((v, idx) => (
                             <ScrollReveal key={v.title} variant="fadeUp" delay={0.1 * (idx + 1)}>
-                                <div className="p-8 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] hover:border-orange-500/20 transition-all duration-300">
+                                <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.15)" className="p-8 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] hover:border-orange-500/20 transition-all duration-300">
                                     <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-xl w-fit mb-6">
                                         {v.icon}
                                     </div>
                                     <h3 className="font-sans font-bold text-lg text-white mb-3">{v.title}</h3>
                                     <p className="text-zinc-400 text-sm leading-relaxed">{v.desc}</p>
-                                </div>
+                                </SpotlightCard>
                             </ScrollReveal>
                         ))}
                     </div>
@@ -124,7 +125,7 @@ export default function Careers() {
                     <div className="space-y-4">
                         {jobs.map((job, idx) => (
                             <ScrollReveal key={job.title} variant="fadeUp" delay={0.1 * (idx + 1)}>
-                                <div className="p-6 rounded-2xl bg-[#1c1c20] border border-[#2c2c33] hover:border-orange-500/30 transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.2)" className="p-6 rounded-2xl bg-[#1c1c20] border border-[#2c2c33] hover:border-orange-500/30 transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                     <div>
                                         <h3 className="font-sans font-bold text-lg text-white group-hover:text-orange-400 transition-colors">
                                             {job.title}
@@ -146,12 +147,12 @@ export default function Careers() {
                                     >
                                         Apply Now
                                     </a>
-                                </div>
+                                </SpotlightCard>
                             </ScrollReveal>
                         ))}
 
                         <ScrollReveal variant="grow" delay={0.4}>
-                            <div className="p-8 rounded-2xl bg-[#1a1a1e]/40 border border-dashed border-[#2c2c33] text-center max-w-xl mx-auto mt-12">
+                            <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.1)" className="p-8 rounded-2xl bg-[#1a1a1e]/40 border border-dashed border-[#2c2c33] text-center max-w-xl mx-auto mt-12">
                                 <h4 className="font-sans font-bold text-white mb-2">Don't see your role?</h4>
                                 <p className="text-zinc-400 text-xs leading-relaxed mb-4">
                                     We are always looking for exceptional engineers, marketers, and creators who care about building tools that save people busywork.
@@ -162,7 +163,7 @@ export default function Careers() {
                                 >
                                     Get in touch ➔
                                 </a>
-                            </div>
+                            </SpotlightCard>
                         </ScrollReveal>
                     </div>
                 </div>

@@ -2,6 +2,7 @@ import { Sparkles, Download, Mail, Copy } from "lucide-react";
 import Navbar from "../components/Home/Navbar";
 import Footer from "../components/Home/Footer";
 import ScrollReveal from "../components/ScrollReveal";
+import SpotlightCard from "../components/SpotlightCard";
 import toast from "react-hot-toast";
 
 const brandColors = [
@@ -48,7 +49,7 @@ export default function Press() {
 
                     {/* Boilerplate */}
                     <ScrollReveal variant="fadeUp" delay={0.1}>
-                        <div className="p-8 rounded-2xl bg-[#1c1c20] border border-[#2c2c33] mb-12">
+                        <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.15)" className="p-8 rounded-2xl bg-[#1c1c20] border border-[#2c2c33] mb-12">
                             <h2 className="font-sans font-bold text-xl text-white mb-4">About SocialSparrow (Boilerplate)</h2>
                             <p className="text-zinc-400 text-sm leading-relaxed mb-4">
                                 SocialSparrow is an AI-powered social media scheduling and automation platform designed specifically for community managers, creators, and marketing agencies. It centralizes posting across Twitter/X, LinkedIn, Facebook, and Instagram into one calendar, leveraging native Google Gemini generative AI to write, adapt, and schedule engaging copy on autopilot.
@@ -56,14 +57,14 @@ export default function Press() {
                             <p className="text-zinc-400 text-sm leading-relaxed">
                                 Founded in 2026, SocialSparrow is remote-first and built by social media practitioners to eliminate tab fatigue, manual scheduling, and scheduling errors.
                             </p>
-                        </div>
+                        </SpotlightCard>
                     </ScrollReveal>
 
                     {/* Brand Assets */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                         {/* Logos */}
                         <ScrollReveal variant="fadeUp" delay={0.2}>
-                            <div className="p-8 rounded-2xl bg-[#1c1c20] border border-[#2c2c33] h-full flex flex-col justify-between">
+                            <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.15)" className="p-8 rounded-2xl bg-[#1c1c20] border border-[#2c2c33] h-full flex flex-col justify-between">
                                 <div>
                                     <h3 className="font-sans font-bold text-lg text-white mb-2">Logo Assets</h3>
                                     <p className="text-zinc-400 text-xs leading-relaxed mb-6">
@@ -77,12 +78,12 @@ export default function Press() {
                                     <Download className="size-4" />
                                     <span>Download Logo Pack (.zip)</span>
                                 </button>
-                            </div>
+                            </SpotlightCard>
                         </ScrollReveal>
 
                         {/* Colors */}
                         <ScrollReveal variant="fadeUp" delay={0.3}>
-                            <div className="p-8 rounded-2xl bg-[#1c1c20] border border-[#2c2c33] h-full">
+                            <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.15)" className="p-8 rounded-2xl bg-[#1c1c20] border border-[#2c2c33] h-full">
                                 <h3 className="font-sans font-bold text-lg text-white mb-4">Brand Colors</h3>
                                 <div className="space-y-4">
                                     {brandColors.map((color) => (
@@ -104,13 +105,13 @@ export default function Press() {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </SpotlightCard>
                         </ScrollReveal>
                     </div>
 
                     {/* Media Contact */}
                     <ScrollReveal variant="grow" delay={0.2}>
-                        <div className="p-8 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] text-center max-w-xl mx-auto">
+                        <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.15)" className="p-8 rounded-2xl bg-[#1a1a1e] border border-[#2c2c33] text-center max-w-xl mx-auto">
                             <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-2xl w-fit mx-auto mb-6 text-orange-400">
                                 <Mail className="size-6" />
                             </div>
@@ -125,7 +126,7 @@ export default function Press() {
                             >
                                 press@socialsparrow.app
                             </a>
-                        </div>
+                        </SpotlightCard>
                     </ScrollReveal>
                 </div>
             </section>
