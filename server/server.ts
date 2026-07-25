@@ -105,7 +105,7 @@ app.use(
                 ? "The submitted data is invalid. Please review the form and try again."
                 : err?.response?.data?.message || err?.message || "Internal Server Error";
         const status = isDuplicateKey ? 409 : isValidationError ? 400 : err?.status || err?.statusCode || 500;
-        res.status(status).json({ message });
+        res.status(status).json({ message, errorDetails: err?.message || String(err) });
     }
 );
 
