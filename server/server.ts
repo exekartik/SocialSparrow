@@ -7,7 +7,6 @@ import socialAuthRouter from "./routes/SocialAuthRouters";
 import accountRoute from "./routes/accountRoute";
 import postRoute from "./routes/postRoute";
 import activityRouter from "./routes/activityroute";
-import { initScheduler } from "./services/SchedulerService";
 
 const app = express();
 
@@ -56,7 +55,9 @@ app.use(async (_req: Request, res: Response, next: NextFunction) => {
 
 // ─── Scheduler (only in non-serverless / long-running environments) ────────────
 if (process.env.NODE_ENV !== "production") {
-    initScheduler();
+    import("./services/SchedulerService").then((m) => m.initScheduler()).catch((err) => {
+        console.warn("Scheduler init warning:", err?.message || err);
+    });
 }
 
 const port = process.env.PORT || 3000;
