@@ -11,41 +11,80 @@ import { initScheduler } from "./services/SchedulerService.js";
 
 const app = express();
 
-// Connect Database
-connectDB().catch((err) => {
-    console.error("Initial database connection error:", err.message);
+// ─── CORS (MUST be first — handles OPTIONS preflight before anything else) ─────
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:4173",
+    "https://social-sparrow-one.vercel.app",
+    process.env.FRONTEND_URL,
+].filter(Boolean) as string[];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow requests with no origin (curl, Postman, mobile apps, server-to-server)
+        if (!origin) return callback(null, true);
+        // Allow whitelisted origins
+        if (allowedOrigins.some(allowed => origin === allowed || origin.startsWith(allowed))) {
+            return callback(null, true);
+        }
+        // Allow all *.vercel.app subdomains dynamically (preview deployments)
+        if (origin.endsWith(".vercel.app")) {
+            return callback(null, true);
+        }
+        callback(new Error(`CORS: Origin ${origin} not allowed`));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+// ─── Body Parser ──────────────────────────────────────────────────────────────
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true }));
+
+// ─── Database Connection Middleware (lazy connect — safe for Vercel serverless) ─
+app.use(async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err: any) {
+        console.error("DB connection middleware error:", err.message);
+        res.status(503).json({ message: "Service temporarily unavailable. Database connection failed." });
+    }
 });
 
-// Initialize scheduler service
-initScheduler();
-
-// Middleware
-app.use(cors());
-app.use(express.json());
+// ─── Scheduler (only in non-serverless / long-running environments) ────────────
+if (process.env.NODE_ENV !== "production") {
+    initScheduler();
+}
 
 const port = process.env.PORT || 3000;
 
+// ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/", (_req: Request, res: Response) => {
-    res.send("SocialSparrow API Server is Live!");
+    res.json({ status: "ok", message: "SocialSparrow API Server is Live!" });
 });
 
-// Routes
+// ─── Routes ───────────────────────────────────────────────────────────────────
 app.use("/api/auth", authRouter);
 app.use("/api/social", socialAuthRouter);
 app.use("/api/accounts", accountRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/activity", activityRouter);
 
-// Global Error Handler
+// ─── Global Error Handler ─────────────────────────────────────────────────────
 app.use(
     (err: any, _req: Request, res: Response, _next: NextFunction) => {
         console.error("Global API Error:", err);
-        res.status(500).json({
-            message: err?.response?.data?.message || err?.message || "Internal Server Error"
-        });
+        // Don't send CORS error message verbatim to client
+        const message = err?.response?.data?.message || err?.message || "Internal Server Error";
+        const status = err?.status || err?.statusCode || 500;
+        res.status(status).json({ message });
     }
 );
 
+// ─── Local Dev Server ─────────────────────────────────────────────────────────
 if (process.env.NODE_ENV !== "production") {
     app.listen(port, () => {
         console.log(`Server is running at http://localhost:${port}`);

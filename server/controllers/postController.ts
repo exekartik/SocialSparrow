@@ -73,9 +73,10 @@ const generateWithGemini = async (prompt: string, tone?: string): Promise<IGener
     const fallbackImagePrompt = buildVisualImagePrompt(prompt);
     const fallbackCopy = buildDynamicPostCopy(prompt, tone);
 
-    if (apiKey && apiKey.startsWith("AIzaSy")) {
-        const ai = new GoogleGenAI({ apiKey });
-        const formattedPrompt = `Generate a social media post based on this prompt: ${prompt}
+    if (apiKey && apiKey.length > 10) {
+        try {
+            const ai = new GoogleGenAI({ apiKey });
+            const formattedPrompt = `Generate a social media post based on this prompt: ${prompt}
 Tone: ${tone || "Casual & Friendly"}
 Include relevant hashtags.
 
@@ -88,28 +89,31 @@ JSON Format Example:
   "imagePrompt": "A highly detailed, 3D render scene description for image generation"
 }`;
 
-        const candidateModels = ["gemini-3.6-flash", "gemini-3.5-flash"];
-        
-        for (const model of candidateModels) {
-            try {
-                const response = await ai.models.generateContent({
-                    model,
-                    contents: formattedPrompt
-                });
-                if (response && response.text) {
-                    const text = response.text.trim();
-                    const jsonMatch = text.match(/\{[\s\S]*\}/);
-                    if (jsonMatch) {
-                        const parsed = JSON.parse(jsonMatch[0]);
-                        return {
-                            content: parsed.content || fallbackCopy,
-                            imagePrompt: parsed.imagePrompt ? buildVisualImagePrompt(parsed.imagePrompt) : fallbackImagePrompt
-                        };
+            const candidateModels = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-latest"];
+            
+            for (const model of candidateModels) {
+                try {
+                    const response = await ai.models.generateContent({
+                        model,
+                        contents: formattedPrompt
+                    });
+                    if (response && response.text) {
+                        const text = response.text.trim();
+                        const jsonMatch = text.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            const parsed = JSON.parse(jsonMatch[0]);
+                            return {
+                                content: parsed.content || fallbackCopy,
+                                imagePrompt: parsed.imagePrompt ? buildVisualImagePrompt(parsed.imagePrompt) : fallbackImagePrompt
+                            };
+                        }
                     }
+                } catch (modelErr: any) {
+                    console.warn(`Gemini model ${model} failed: ${modelErr?.message || modelErr}`);
                 }
-            } catch (err: any) {
-                console.warn(`Gemini model ${model} failed, using intelligent fallback...`);
             }
+        } catch (err: any) {
+            console.warn("Gemini AI unavailable, using intelligent fallback:", err?.message || err);
         }
     }
 
@@ -275,11 +279,18 @@ export const schedulePost = async (req: AuthRequest, res: Response): Promise<voi
         let mediaUrl = bodyMediaUrl;
         let mediaType = bodyMediaType;
 
-        // If file uploaded via Multer
+        // If file uploaded via Multer (memory storage — buffer upload to Cloudinary)
         if (req.file) {
             try {
-                const uploadResult = await cloudinary.uploader.upload(req.file.path, {
-                    folder: "post-media"
+                const uploadResult = await new Promise<any>((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        { folder: "post-media" },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    );
+                    stream.end(req.file!.buffer);
                 });
                 mediaUrl = uploadResult.secure_url;
                 mediaType = req.file.mimetype.startsWith("video") ? "video" : "image";

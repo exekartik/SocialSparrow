@@ -2,11 +2,19 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const getBaseUrl = () => {
-    if (import.meta.env.VITE_API_BASE_URL) {
-        const url = import.meta.env.VITE_API_BASE_URL;
-        return url.endsWith("/api") ? url : `${url.replace(/\/$/, "")}/api`;
+    const envUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
+    const isOnLocalhost = typeof window !== "undefined" && 
+        (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+
+    if (envUrl) {
+        const isLocalUrl = envUrl.includes("localhost") || envUrl.includes("127.0.0.1");
+        // Only use the env URL if we're actually running on localhost, otherwise ignore it
+        if (!isLocalUrl || isOnLocalhost) {
+            return envUrl.endsWith("/api") ? envUrl : `${envUrl.replace(/\/$/, "")}/api`;
+        }
     }
-    if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+    
+    if (isOnLocalhost) {
         return "http://localhost:3000/api";
     }
     return "/api";
