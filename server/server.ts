@@ -1,13 +1,13 @@
 import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
-import connectDB from "./config/Db.js";
-import authRouter from "./routes/user.route.js";
-import socialAuthRouter from "./routes/SocialAuthRouters.js";
-import accountRoute from "./routes/accountRoute.js";
-import postRoute from "./routes/postRoute.js";
-import activityRouter from "./routes/activityroute.js";
-import { initScheduler } from "./services/SchedulerService.js";
+import connectDB from "./config/Db";
+import authRouter from "./routes/user.route";
+import socialAuthRouter from "./routes/SocialAuthRouters";
+import accountRoute from "./routes/accountRoute";
+import postRoute from "./routes/postRoute";
+import activityRouter from "./routes/activityroute";
+import { initScheduler } from "./services/SchedulerService";
 
 const app = express();
 

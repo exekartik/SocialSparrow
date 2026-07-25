@@ -1,8 +1,8 @@
 import { Response } from "express";
-import { AuthRequest } from "../middleware/authMiddleware.js";
-import { Account } from "../modules/Account.js";
-import zernio from "../config/Zernio.js";
-import { logActivity } from "../controllers/Acticity.controller.js";
+import { AuthRequest } from "../middleware/authMiddleware";
+import { Account } from "../modules/Account";
+import zernio from "../config/Zernio";
+import { logActivity } from "../controllers/Acticity.controller";
 
 /**
  * ===========================================================

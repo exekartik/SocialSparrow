@@ -1,10 +1,10 @@
 import { Response } from "express";
-import { AuthRequest } from "../middleware/authMiddleware.js";
+import { AuthRequest } from "../middleware/authMiddleware";
 import { GoogleGenAI } from "@google/genai";
-import Generation from "../modules/Generation.js";
-import Post from "../modules/post.js";
-import cloudinary from "../config/cloudnary.js";
-import { logActivity } from "../controllers/Acticity.controller.js";
+import Generation from "../modules/Generation";
+import Post from "../modules/post";
+import cloudinary from "../config/cloudnary";
+import { logActivity } from "../controllers/Acticity.controller";
 
 export interface IGeneratedAIResult {
     content: string;

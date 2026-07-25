@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import zernio from "../config/Zernio.js"; // Corrected casing to match Zernio.ts
-import { User } from "../modules/user.model.js"; // Path to User model
-import { Account } from "../modules/Account.js"; // Path to Account model
-import { AuthRequest } from "../middleware/authMiddleware.js";
+import zernio from "../config/Zernio";
+import { User } from "../modules/user.model";
+import { Account } from "../modules/Account";
+import { AuthRequest } from "../middleware/authMiddleware";
 
 /**
  * ===========================================================

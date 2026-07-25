@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { authMiddleware } from "../middleware/authMiddleware.js";
-import { getActivityLogs, deleteActivityLog } from "../controllers/Acticity.controller.js";
+import { authMiddleware } from "../middleware/authMiddleware";
+import { getActivityLogs, deleteActivityLog } from "../controllers/Acticity.controller";
 
 const activityRouter = Router();
 

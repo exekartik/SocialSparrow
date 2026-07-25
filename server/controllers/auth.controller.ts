@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { User } from "../modules/user.model.js";
-import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
-import { hashToken } from "../utils/hash.js";
+import { User } from "../modules/user.model";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
+import { hashToken } from "../utils/hash";
 
 /**
  * ===========================================================

@@ -1,8 +1,8 @@
 import cron from "node-cron";
-import Post from "../modules/post.js";
-import { Account } from "../modules/Account.js";
-import zernio from "../config/Zernio.js";
-import { logActivity } from "../controllers/Acticity.controller.js";
+import Post from "../modules/post";
+import { Account } from "../modules/Account";
+import zernio from "../config/Zernio";
+import { logActivity } from "../controllers/Acticity.controller";
 
 /**
  * Initialize the background scheduler cron job

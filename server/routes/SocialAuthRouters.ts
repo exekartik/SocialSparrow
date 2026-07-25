@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { generateAuthUrl, syncAccounts } from "../controllers/SocialAuthController.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+import { generateAuthUrl, syncAccounts } from "../controllers/SocialAuthController";
+import { authMiddleware } from "../middleware/authMiddleware";
 
 const socialAuthRouter = Router();
 

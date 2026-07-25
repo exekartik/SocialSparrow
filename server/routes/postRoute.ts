@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { authMiddleware } from "../middleware/authMiddleware.js";
-import { upload } from "../config/multer.js";
+import { authMiddleware } from "../middleware/authMiddleware";
+import { upload } from "../config/multer";
 import {
     genreatepost,
     getGenerations,
@@ -8,7 +8,7 @@ import {
     getPosts,
     sharePost,
     deletePost
-} from "../controllers/postController.js";
+} from "../controllers/postController";
 
 const postRoute = Router();
 
