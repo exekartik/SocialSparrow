@@ -37,9 +37,15 @@ export default function Footer() {
                             <ul className="space-y-2">
                                 {links.map((link) => (
                                     <li key={link}>
-                                        <a href="#" className="text-xs text-zinc-400 hover:text-white transition-colors">
-                                            {link}
-                                        </a>
+                                        {link === "About" ? (
+                                            <Link to="/about" onClick={() => scrollTo(0, 0)} className="text-xs text-zinc-400 hover:text-white transition-colors">
+                                                {link}
+                                            </Link>
+                                        ) : (
+                                            <a href="#" className="text-xs text-zinc-400 hover:text-white transition-colors">
+                                                {link}
+                                            </a>
+                                        )}
                                     </li>
                                 ))}
                             </ul>

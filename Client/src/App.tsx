@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import About from "./pages/About";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Account from "./pages/Account";
@@ -52,6 +53,7 @@ export default function App() {
             />
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
                 <Route path="/login" element={<Login />} />
                 <Route element={<ProtectedLayout />}>
                     <Route path="/dashboard" element={<Dashboard />} />
