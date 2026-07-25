@@ -28,4 +28,6 @@ const accountSchema = new mongoose.Schema<IAccount>({
     zernioAccountId: { type: String, required: true }
 }, { timestamps: true });
 
+accountSchema.index({ user: 1, zernioAccountId: 1 }, { unique: true });
+
 export const Account: Model<IAccount> = mongoose.model<IAccount>("Account", accountSchema);

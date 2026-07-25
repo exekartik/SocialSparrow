@@ -10,6 +10,7 @@ import {
   Plus
 } from 'lucide-react';
 import SpecularButton from './SpecularButton';
+import { useAuth } from '../context/authContext';
 
 import toast from 'react-hot-toast';
 
@@ -28,6 +29,7 @@ const navItems = [
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, setIsOpen, setisOpen }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleClose = () => {
     if (setIsOpen) setIsOpen(false);
@@ -131,8 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, setIsOpen, setisOpen 
         </div>
         <button
           onClick={() => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            logout();
             toast.success("Signed out of workspace");
             navigate('/login');
           }}
@@ -146,4 +147,3 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, setIsOpen, setisOpen 
 };
 
 export default Sidebar;
-

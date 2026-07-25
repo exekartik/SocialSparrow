@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -8,6 +8,18 @@ import Account from "./pages/Account";
 import AIcomposer from "./pages/AIcomposer";
 import Scheduler from "./pages/Scheduler";
 import CustomCursor from "./components/CustomCursor";
+import CoolLoadingSpinner from "./components/CoolLoadingSpinner";
+import { useAuth } from "./context/authContext";
+
+function ProtectedLayout() {
+    const { isAuthenticated, isLoading } = useAuth();
+
+    if (isLoading) {
+        return <CoolLoadingSpinner fullScreen text="Restoring your session..." />;
+    }
+
+    return isAuthenticated ? <Layout /> : <Navigate to="/login" replace />;
+}
 
 export default function App() {
     return (
@@ -41,12 +53,15 @@ export default function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
-                <Route element={<Layout />}>
+                <Route element={<ProtectedLayout />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/accounts" element={<Account />} />
                     <Route path="/AIcomposer" element={<AIcomposer />} />
+                    <Route path="/ai-composer" element={<AIcomposer />} />
                     <Route path="/scheduler" element={<Scheduler />} />
+                    <Route path="/schedule" element={<Scheduler />} />
                 </Route>
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </>
     );

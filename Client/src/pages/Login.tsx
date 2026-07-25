@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { MailIcon, LockIcon, ArrowRightIcon, User2Icon, Bird, Eye, EyeOff } from "lucide-react";
 import AutumnLeavesCanvas from "../components/AutumnLeavesCanvas";
 import api from "../api/axios";
@@ -31,15 +32,20 @@ export default function Login() {
             const data = res.data;
             const token = data.accessToken || data.token;
 
-            if (token) {
-                const userObj = data.user || { _id: "1", name: name || email.split("@")[0], email };
-                authLogin(userObj, token);
-                toast.success(loginState ? "Welcome back! Signed in successfully." : "Account created successfully!");
-                navigate("/dashboard");
+            if (!token || !data.user) {
+                throw new Error("The server did not return a valid sign-in session. Please try again.");
             }
-        } catch (err: any) {
+
+            authLogin(data.user, token);
+            toast.success(loginState ? "Welcome back! Signed in successfully." : "Account created successfully!");
+            navigate("/dashboard");
+        } catch (err: unknown) {
             console.error("Login Error:", err);
-            const errMsg = err?.response?.data?.message || err?.message || "Authentication failed. Please check your credentials.";
+            const errMsg = axios.isAxiosError<{ message?: string }>(err)
+                ? err.response?.data?.message || (err.message === "Network Error" ? "Unable to connect to SocialSparrow server. Please ensure the backend is running." : err.message)
+                : err instanceof Error
+                    ? err.message
+                    : "Authentication failed. Please check your credentials.";
             setError(errMsg);
             toast.error(errMsg);
         } finally {
@@ -98,6 +104,8 @@ export default function Login() {
                                     <input 
                                         type="text" 
                                         required 
+                                        minLength={2}
+                                        maxLength={50}
                                         autoComplete="name"
                                         placeholder="Enter your name" 
                                         className="w-full pl-10 pr-4 py-2.5 bg-[#202025]/90 border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 
@@ -131,6 +139,8 @@ export default function Login() {
                                 <input 
                                     type={showPassword ? "text" : "password"} 
                                     required 
+                                    minLength={8}
+                                    maxLength={128}
                                     autoComplete={loginState ? "current-password" : "new-password"}
                                     placeholder="••••••••" 
                                     className="w-full pl-10 pr-10 py-2.5 bg-[#202025]/90 border border-[#2c2c33] text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/40 transition-colors" 

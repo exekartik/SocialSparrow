@@ -3,7 +3,9 @@ import { AuthRequest } from "../middleware/authMiddleware";
 import { GoogleGenAI } from "@google/genai";
 import Generation from "../modules/Generation";
 import Post from "../modules/post";
-import cloudinary from "../config/cloudnary";
+import { Account } from "../modules/Account";
+import cloudinary, { isCloudinaryConfigured } from "../config/cloudnary";
+import zernio, { isZernioConfigured } from "../config/Zernio";
 import { logActivity } from "../controllers/Acticity.controller";
 
 export interface IGeneratedAIResult {
@@ -260,8 +262,12 @@ export const schedulePost = async (req: AuthRequest, res: Response): Promise<voi
     try {
         const { content, platforms, scheduledFor, mediaUrl: bodyMediaUrl, mediaType: bodyMediaType } = req.body;
 
-        if (!content) {
+        if (typeof content !== "string" || !content.trim()) {
             res.status(400).json({ message: "Post content is required" });
+            return;
+        }
+        if (content.length > 5000) {
+            res.status(400).json({ message: "Post content must be 5,000 characters or fewer." });
             return;
         }
 
@@ -276,11 +282,30 @@ export const schedulePost = async (req: AuthRequest, res: Response): Promise<voi
             parsedPlatforms = platforms;
         }
 
+        const supportedPlatforms = ["twitter", "linkedin", "facebook", "instagram"];
+        parsedPlatforms = parsedPlatforms.filter((platform): platform is string =>
+            typeof platform === "string" && supportedPlatforms.includes(platform)
+        );
+        if (parsedPlatforms.length === 0) {
+            res.status(400).json({ message: "Select at least one supported social platform." });
+            return;
+        }
+
+        const scheduledDate = scheduledFor ? new Date(scheduledFor) : new Date(Date.now() + 60000);
+        if (Number.isNaN(scheduledDate.getTime())) {
+            res.status(400).json({ message: "Enter a valid date and time for the post." });
+            return;
+        }
+
         let mediaUrl = bodyMediaUrl;
         let mediaType = bodyMediaType;
 
         // If file uploaded via Multer (memory storage — buffer upload to Cloudinary)
         if (req.file) {
+            if (!isCloudinaryConfigured) {
+                res.status(503).json({ message: "Media uploads are not configured yet." });
+                return;
+            }
             try {
                 const uploadResult = await new Promise<any>((resolve, reject) => {
                     const stream = cloudinary.uploader.upload_stream(
@@ -303,9 +328,9 @@ export const schedulePost = async (req: AuthRequest, res: Response): Promise<voi
 
         const post = await Post.create({
             user: req.user._id,
-            content,
-            platforms: parsedPlatforms.length > 0 ? parsedPlatforms : ["twitter"],
-            scheduledFor: scheduledFor ? new Date(scheduledFor) : new Date(Date.now() + 60000),
+            content: content.trim(),
+            platforms: parsedPlatforms,
+            scheduledFor: scheduledDate,
             mediaUrl,
             mediaType,
             status: "scheduled"
@@ -362,13 +387,49 @@ export const sharePost = async (req: AuthRequest, res: Response): Promise<void> 
             return;
         }
 
+        if (!isZernioConfigured) {
+            res.status(503).json({ message: "Publishing is not configured yet." });
+            return;
+        }
+        if (post.status === "published") {
+            res.status(409).json({ message: "This post has already been published." });
+            return;
+        }
+
+        const targetPlatforms = Array.isArray(post.platforms)
+            ? post.platforms
+            : typeof post.platforms === "string"
+                ? post.platforms.split(",").map((platform) => platform.trim()).filter(Boolean)
+                : post.platform ? [post.platform] : [];
+        const accounts = await Account.find({
+            user: req.user._id,
+            platform: { $in: targetPlatforms },
+            status: "connected"
+        } as any);
+        if (accounts.length === 0) {
+            res.status(409).json({ message: "Connect an account for the selected platform before publishing." });
+            return;
+        }
+
+        await zernio.posts.createPost({
+            body: {
+                content: post.content,
+                platforms: accounts.map((account) => ({
+                    platform: account.platform,
+                    accountId: account.zernioAccountId
+                })),
+                mediaUrls: post.mediaUrl ? [post.mediaUrl] : undefined,
+                publishNow: true
+            }
+        });
+
         post.status = "published";
         await post.save();
 
         await logActivity(
             req.user._id,
             "post",
-            `Published post across platforms`,
+            `Published post to: ${accounts.map((account) => account.platform).join(", ")}`,
             post._id
         );
 

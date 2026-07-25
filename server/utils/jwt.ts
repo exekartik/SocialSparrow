@@ -1,12 +1,28 @@
 import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
 
-const getAccessSecret = () => {
-    return process.env.JWT_SECRET || process.env.JWT_ACCESS_SECRET || "fallbackSecret";
+type ConfigError = Error & { statusCode: number };
+
+const missingSecretError = (name: string): ConfigError => {
+    const error = new Error(`${name} is not configured. Add it to the server environment variables.`) as ConfigError;
+    error.statusCode = 503;
+    return error;
 };
 
-const getRefreshSecret = () => {
-    return process.env.JWT_REFRESH_SECRET || "fallbackRefreshSecret";
+export const getAccessSecret = (): string => {
+    const secret = process.env.JWT_SECRET || process.env.JWT_ACCESS_SECRET;
+    if (!secret) {
+        throw missingSecretError("JWT_ACCESS_SECRET");
+    }
+    return secret.trim();
+};
+
+const getRefreshSecret = (): string => {
+    const secret = process.env.JWT_REFRESH_SECRET;
+    if (!secret) {
+        throw missingSecretError("JWT_REFRESH_SECRET");
+    }
+    return secret.trim();
 };
 
 /**

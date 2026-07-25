@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { User } from "../modules/user.model";
+import { getAccessSecret } from "../utils/jwt";
 
 export interface AuthRequest extends Request {
     user?: any;
@@ -28,8 +29,15 @@ export const authMiddleware = async (
         return res.status(401).json({ message: "Access denied. No token provided." });
     }
 
+    let secret: string;
     try {
-        const secret = process.env.JWT_SECRET || process.env.JWT_ACCESS_SECRET || "fallbackSecret";
+        secret = getAccessSecret();
+    } catch (error) {
+        next(error);
+        return;
+    }
+
+    try {
         const decodedToken = jwt.verify(token, secret) as DecodedToken;
 
         const user = await User.findById(decodedToken.id).select("-password");

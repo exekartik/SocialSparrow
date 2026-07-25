@@ -3,6 +3,40 @@ import { User } from "../modules/user.model";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
 import { hashToken } from "../utils/hash";
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type ValidatedRegistration = {
+    name: string;
+    email: string;
+    password: string;
+};
+
+const getRegistrationData = (body: unknown): ValidatedRegistration | { message: string } => {
+    const { name, email, password } = (body ?? {}) as Record<string, unknown>;
+
+    if (typeof name !== "string" || typeof email !== "string" || typeof password !== "string") {
+        return { message: "Name, email and password are required." };
+    }
+
+    const normalizedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (normalizedName.length < 2 || normalizedName.length > 50) {
+        return { message: "Name must be between 2 and 50 characters." };
+    }
+    if (!EMAIL_PATTERN.test(normalizedEmail)) {
+        return { message: "Enter a valid email address." };
+    }
+    if (password.length < 8 || password.length > 128) {
+        return { message: "Password must be between 8 and 128 characters." };
+    }
+
+    return { name: normalizedName, email: normalizedEmail, password };
+};
+
+const isValidationMessage = (value: ValidatedRegistration | { message: string }): value is { message: string } =>
+    "message" in value;
+
 /**
  * ===========================================================
  *   AUTH CONTROLLER
@@ -31,18 +65,14 @@ export const registerUser = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { name, email, password } = req.body;
-
-        // 1. Validation
-        if (!name || !email || !password) {
-            res.status(400).json({
-                message: "Name, email and password are required",
-            });
+        const registration = getRegistrationData(req.body);
+        if (isValidationMessage(registration)) {
+            res.status(400).json({ message: registration.message });
             return;
         }
 
         // 2. Check for existing user
-        const userExists = await User.findOne({ email });
+        const userExists = await User.findOne({ email: registration.email });
 
         if (userExists) {
             res.status(400).json({
@@ -54,9 +84,7 @@ export const registerUser = async (
         // 3. Create the user
         // Note: We don't hash the password here because the Mongoose pre-save hook in user.model.ts handles it!
         const user = await User.create({
-            name,
-            email,
-            password,
+            ...registration,
         });
 
         // 4. Generate Tokens
@@ -104,15 +132,20 @@ export const loginUser = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { email, password } = req.body;
+        const { email, password } = (req.body ?? {}) as Record<string, unknown>;
+        if (typeof email !== "string" || typeof password !== "string") {
+            res.status(400).json({ message: "Email and password are required." });
+            return;
+        }
 
-        if (!email || !password) {
-            res.status(400).json({ message: "Email and password are required" });
+        const normalizedEmail = email.trim().toLowerCase();
+        if (!EMAIL_PATTERN.test(normalizedEmail) || password.length === 0) {
+            res.status(400).json({ message: "Enter a valid email address and password." });
             return;
         }
 
         // We must use .select("+password") because we set `select: false` in the User schema
-        const user = await User.findOne({ email }).select("+password");
+        const user = await User.findOne({ email: normalizedEmail }).select("+password");
 
         if (!user) {
             res.status(401).json({ message: "Invalid email or password" });

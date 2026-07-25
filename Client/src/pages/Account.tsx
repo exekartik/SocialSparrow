@@ -5,7 +5,6 @@ import {
   ShieldCheck, 
   Globe,
   Share2,
-  Video,
   MessageSquare,
   Trash2,
   AlertCircle
@@ -18,13 +17,18 @@ const platformOptions = [
   { id: 'linkedin', name: 'LinkedIn', icon: Globe, color: 'text-amber-400' },
   { id: 'instagram', name: 'Instagram', icon: MessageSquare, color: 'text-pink-400' },
   { id: 'facebook', name: 'Facebook Page', icon: Globe, color: 'text-blue-500' },
-  { id: 'youtube', name: 'YouTube Channel', icon: Video, color: 'text-red-500' },
 ];
 
 import toast from 'react-hot-toast';
 
+type ConnectedAccount = {
+  _id: string;
+  platform: string;
+  handle: string;
+};
+
 export default function Account() {
-  const [dbAccounts, setDbAccounts] = useState<any[]>([]);
+  const [dbAccounts, setDbAccounts] = useState<ConnectedAccount[]>([]);
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -35,13 +39,29 @@ export default function Account() {
       if (res.success && Array.isArray(res.data)) {
         setDbAccounts(res.data);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Fetch Accounts Error:', err);
     }
   };
 
   useEffect(() => {
-    fetchAccounts();
+    const loadAccounts = async () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('connected') === '1') {
+        try {
+          await apiFetch('/social/sync');
+          toast.success('Social account connected successfully.');
+        } catch (err) {
+          console.error('Account sync failed:', err);
+          toast.error('The account was authorized, but could not be synced. Please try again.');
+        } finally {
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      }
+      await fetchAccounts();
+    };
+
+    void loadAccounts();
   }, []);
 
   const handleConnectPlatform = async (platformId: string) => {
@@ -50,30 +70,14 @@ export default function Account() {
     try {
       // 1. Try to get OAuth redirect URL from Zernio
       const res = await apiFetch(`/social/auth/${platformId}`);
-      if (res.success && res.data?.authUrl) {
-        window.location.href = res.data.authUrl;
-        return;
+      const authUrl = res.success ? res.data?.authUrl : undefined;
+      if (!authUrl) {
+        throw new Error('The social provider did not return an authorization URL.');
       }
-    } catch (err: any) {
-      console.warn('Zernio OAuth redirect failed, falling back to instant local connection:', err);
-    }
 
-    // Fallback: Add account directly into MongoDB for local development testing
-    try {
-      await apiFetch('/accounts/add-account', {
-        method: 'POST',
-        body: JSON.stringify({
-          platform: platformId,
-          handle: `@sparrow_${platformId}`,
-          avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
-          zernioAccountId: `zernio_acc_${Date.now()}`
-        })
-      });
-      await fetchAccounts();
-      setShowConnectModal(false);
-      toast.success(`${platformId.toUpperCase()} platform connected!`);
-    } catch (fallbackErr: any) {
-      const errMsg = fallbackErr?.message || 'Failed to connect account.';
+      window.location.assign(authUrl);
+    } catch (connectError: unknown) {
+      const errMsg = connectError instanceof Error ? connectError.message : 'Failed to start social account connection.';
       setError(errMsg);
       toast.error(errMsg);
     } finally {
@@ -86,9 +90,9 @@ export default function Account() {
       await apiFetch(`/accounts/${accountId}`, { method: 'DELETE' });
       setDbAccounts(prev => prev.filter(a => a._id !== accountId));
       toast.success("Account disconnected successfully");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to disconnect account:', err);
-      toast.error(err?.message || 'Failed to disconnect account');
+      toast.error(err instanceof Error ? err.message : 'Failed to disconnect account');
     }
   };
 
@@ -165,7 +169,11 @@ export default function Account() {
 
                 {isConnected ? (
                   <button 
-                    onClick={() => handleDisconnect(connectedAccount._id)}
+                    onClick={() => {
+                      if (connectedAccount) {
+                        void handleDisconnect(connectedAccount._id);
+                      }
+                    }}
                     className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#242429] text-zinc-300 hover:text-red-400 hover:bg-[#2c2c33] border border-[#2c2c33] transition-all cursor-pointer flex items-center gap-1"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

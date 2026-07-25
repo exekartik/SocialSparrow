@@ -1,9 +1,13 @@
 import { Zernio } from "@zernio/node";
 
-const apiKey = process.env.ZERNIO_API_KEY || process.env.ZERNO_API_KEY || "sk_e9e795c754483c033bdca2620773c9ffebb80bd828c76feb34309aa34ca813b6";
+const apiKey = process.env.ZERNIO_API_KEY || process.env.ZERNO_API_KEY;
+
+export const isZernioConfigured = Boolean(apiKey);
 
 const zernio = new Zernio({
-    apiKey,
+    // Individual social routes return a clear configuration error when this is absent.
+    // An empty value keeps unrelated routes, such as login, available.
+    apiKey: apiKey || "",
     baseURL: "https://api.zernio.com/api"
 });
 

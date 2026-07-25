@@ -7,6 +7,7 @@ import socialAuthRouter from "./routes/SocialAuthRouters";
 import accountRoute from "./routes/accountRoute";
 import postRoute from "./routes/postRoute";
 import activityRouter from "./routes/activityroute";
+import internalRouter from "./routes/internalRoute";
 
 const app = express();
 
@@ -15,6 +16,9 @@ const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:3000",
     "http://localhost:4173",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:4173",
     "https://social-sparrow-one.vercel.app",
     process.env.FRONTEND_URL,
 ].filter(Boolean) as string[];
@@ -23,15 +27,24 @@ app.use(cors({
     origin: (origin, callback) => {
         // Allow requests with no origin (curl, Postman, mobile apps, server-to-server)
         if (!origin) return callback(null, true);
-        // Allow whitelisted origins
+        
+        // Allow any local development origin (localhost or 127.0.0.1 on any port)
+        if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+            return callback(null, true);
+        }
+
+        // Allow explicitly configured origins
         if (allowedOrigins.some(allowed => origin === allowed || origin.startsWith(allowed))) {
             return callback(null, true);
         }
+
         // Allow all *.vercel.app subdomains dynamically (preview deployments)
         if (origin.endsWith(".vercel.app")) {
             return callback(null, true);
         }
-        callback(new Error(`CORS: Origin ${origin} not allowed`));
+
+        // Reject cleanly without crashing express
+        callback(null, false);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
@@ -73,6 +86,7 @@ app.use("/api/social", socialAuthRouter);
 app.use("/api/accounts", accountRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/activity", activityRouter);
+app.use("/api/internal", internalRouter);
 
 // ─── 404 Fallback Handler (ensures serverless never hangs) ────────────────────
 app.use((_req: Request, res: Response) => {
@@ -83,8 +97,14 @@ app.use((_req: Request, res: Response) => {
 app.use(
     (err: any, _req: Request, res: Response, _next: NextFunction) => {
         console.error("Global API Error:", err);
-        const message = err?.response?.data?.message || err?.message || "Internal Server Error";
-        const status = err?.status || err?.statusCode || 500;
+        const isDuplicateKey = err?.code === 11000;
+        const isValidationError = err?.name === "ValidationError" || err?.name === "CastError";
+        const message = isDuplicateKey
+            ? "An account with this email already exists."
+            : isValidationError
+                ? "The submitted data is invalid. Please review the form and try again."
+                : err?.response?.data?.message || err?.message || "Internal Server Error";
+        const status = isDuplicateKey ? 409 : isValidationError ? 400 : err?.status || err?.statusCode || 500;
         res.status(status).json({ message });
     }
 );

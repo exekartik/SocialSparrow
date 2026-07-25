@@ -1,118 +1,111 @@
 import cron from "node-cron";
 import Post from "../modules/post";
 import { Account } from "../modules/Account";
-import zernio from "../config/Zernio";
+import zernio, { isZernioConfigured } from "../config/Zernio";
 import { logActivity } from "../controllers/Acticity.controller";
 
-/**
- * Initialize the background scheduler cron job
- * Runs every minute to find scheduled posts that are due,
- * publishes them via the Zernio SDK to the user's connected social platforms,
- * and updates their status in MongoDB.
- */
-export const initScheduler = (): void => {
-    // Run every minute
-    cron.schedule("* * * * *", async () => {
-        try {
-            const now = new Date();
-            
-            // Find posts scheduled for publication that are due or overdue (<= now)
-            const postsToPublish = await Post.find({
-                status: "scheduled",
-                scheduledFor: { $lte: now }
-            });
+export type PublishSummary = {
+    scanned: number;
+    published: number;
+    failed: number;
+    skipped: boolean;
+};
 
-            if (postsToPublish.length === 0) {
-                return;
-            }
+let isPublishing = false;
 
-            console.log(`[SCHEDULER] Found ${postsToPublish.length} posts to publish at ${now.toISOString()}`);
+const getTargetPlatforms = (post: InstanceType<typeof Post>): string[] => {
+    if (Array.isArray(post.platforms)) {
+        return post.platforms;
+    }
+    if (typeof post.platforms === "string") {
+        return post.platforms.split(",").map((platform) => platform.trim()).filter(Boolean);
+    }
+    return post.platform ? [post.platform] : [];
+};
 
-            for (const post of postsToPublish) {
-                try {
-                    // Extract target platforms safely
-                    let platformList: string[] = [];
-                    if (Array.isArray(post.platforms)) {
-                        platformList = post.platforms;
-                    } else if (typeof post.platforms === "string") {
-                        platformList = post.platforms.split(",").map(p => p.trim());
-                    } else if (post.platform) {
-                        platformList = [post.platform];
-                    }
+/** Publishes every due post once, either locally or from a Vercel Cron request. */
+export const publishDuePosts = async (): Promise<PublishSummary> => {
+    if (isPublishing || !isZernioConfigured) {
+        return { scanned: 0, published: 0, failed: 0, skipped: true };
+    }
 
-                    // Find connected social accounts of the user matching the target platforms
-                    const accounts = await Account.find({
-                        user: post.user,
-                        platform: { $in: platformList },
-                        status: "connected"
-                    } as any);
+    isPublishing = true;
+    let published = 0;
+    let failed = 0;
 
-                    if (accounts.length === 0) {
-                        console.warn(`[SCHEDULER] No connected accounts found for post ${post._id} platforms: ${platformList}`);
-                        post.status = "published_failed";
-                        await post.save();
+    try {
+        const postsToPublish = await Post.find({
+            status: "scheduled",
+            scheduledFor: { $lte: new Date() }
+        });
 
-                        await logActivity(
-                            post.user.toString(),
-                            "post",
-                            `Failed to publish scheduled post: No connected social account found for target platforms (${platformList.join(", ")}).`,
-                            post._id
-                        );
-                        continue;
-                    }
+        for (const post of postsToPublish) {
+            try {
+                const platformList = getTargetPlatforms(post);
+                const accounts = await Account.find({
+                    user: post.user,
+                    platform: { $in: platformList },
+                    status: "connected"
+                } as any);
 
-                    // Format platforms list as Zernio expects: [{ platform: string, accountId: string }]
-                    const platformsData = accounts.map((acc: any) => ({
-                        platform: acc.platform,
-                        accountId: acc.zernioAccountId
-                    }));
-
-                    console.log(`[SCHEDULER] Publishing post ${post._id} to Zernio accounts:`, platformsData);
-
-                    // Call Zernio API to publish the post
-                    const { data: zPost } = await zernio.posts.createPost({
-                        body: {
-                            content: post.content,
-                            platforms: platformsData,
-                            mediaUrls: post.mediaUrl ? [post.mediaUrl] : undefined,
-                            publishNow: true
-                        }
-                    });
-
-                    // Mark post as published on success
-                    post.status = "published";
-                    await post.save();
-
-                    const connectedPlatformsStr = accounts.map((a: any) => a.platform).join(", ");
-                    await logActivity(
-                        post.user.toString(),
-                        "post",
-                        `Successfully published scheduled post to: ${connectedPlatformsStr}`,
-                        post._id
-                    );
-
-                    console.log(`[SCHEDULER] Successfully published post ${post._id} to: ${connectedPlatformsStr}`);
-
-                } catch (publishError: any) {
-                    console.error(`[SCHEDULER] Error publishing post ${post._id}:`, publishError?.message || publishError);
-                    
+                if (accounts.length === 0) {
                     post.status = "published_failed";
                     await post.save();
-
+                    failed += 1;
                     await logActivity(
                         post.user.toString(),
                         "post",
-                        `Failed to publish scheduled post: ${publishError?.message || "Internal publishing error"}`,
+                        `Failed to publish scheduled post: no connected account found for ${platformList.join(", ") || "the selected platform"}.`,
                         post._id
                     );
+                    continue;
                 }
+
+                await zernio.posts.createPost({
+                    body: {
+                        content: post.content,
+                        platforms: accounts.map((account) => ({
+                            platform: account.platform,
+                            accountId: account.zernioAccountId
+                        })),
+                        mediaUrls: post.mediaUrl ? [post.mediaUrl] : undefined,
+                        publishNow: true
+                    }
+                });
+
+                post.status = "published";
+                await post.save();
+                published += 1;
+                await logActivity(
+                    post.user.toString(),
+                    "post",
+                    `Successfully published scheduled post to: ${accounts.map((account) => account.platform).join(", ")}`,
+                    post._id
+                );
+            } catch (error: unknown) {
+                post.status = "published_failed";
+                await post.save();
+                failed += 1;
+                const message = error instanceof Error ? error.message : "Internal publishing error";
+                await logActivity(post.user.toString(), "post", `Failed to publish scheduled post: ${message}`, post._id);
+                console.error(`[SCHEDULER] Error publishing post ${post._id}:`, error);
             }
-        } catch (error: any) {
-            console.error("[SCHEDULER CRITICAL ERROR] Cron execution failed:", error?.message || error);
         }
+
+        return { scanned: postsToPublish.length, published, failed, skipped: false };
+    } finally {
+        isPublishing = false;
+    }
+};
+
+/** Starts the developer-machine scheduler. Production uses Vercel Cron. */
+export const initScheduler = (): void => {
+    cron.schedule("* * * * *", () => {
+        void publishDuePosts().catch((error) => {
+            console.error("[SCHEDULER] Cron execution failed:", error);
+        });
     });
 };
 
-// Alias for spelling compatibility
 export const initScheuler = initScheduler;
 export default initScheduler;

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import zernio from "../config/Zernio";
+import zernio, { isZernioConfigured } from "../config/Zernio";
 import { User } from "../modules/user.model";
 import { Account } from "../modules/Account";
 import { AuthRequest } from "../middleware/authMiddleware";
@@ -18,9 +18,8 @@ import { AuthRequest } from "../middleware/authMiddleware";
  * Helper to ensure a user has a Zernio Profile.
  * 
  * Flow:
- * 1. Checks Zernio for any existing profiles.
- * 2. If a profile exists, links its ID (pid) to our local User document.
- * 3. If no profile exists, creates one in Zernio first, then links it to the user.
+ * 1. Reuses the profile previously linked to this local user.
+ * 2. Creates and links a new profile when the user does not have one.
  * 
  * Why? (Advanced concept):
  * Zernio uses "Profiles" as workspaces to group social accounts. We must associate
@@ -28,19 +27,12 @@ import { AuthRequest } from "../middleware/authMiddleware";
  */
 const getOrCreateZernioProfile = async (user: any): Promise<string> => {
     try {
-        // 1. Fetch profiles associated with the Zernio account
-        const result = await zernio.profiles.listProfiles();
-        const data = result.data as any;
-        const profiles: any[] = Array.isArray(data) ? data : data?.profiles || data?.data || [];
-        
-        // If a profile already exists, link it to the user and return the ID
-        if (profiles.length > 0) {
-            const pid = profiles[0]._id || profiles[0].id;
-            await User.findByIdAndUpdate(user._id, { zernioProfileId: pid });
-            return pid;
+        if (user.zernioProfileId) {
+            return user.zernioProfileId;
         }
 
-        // 2. Otherwise, create a new profile in Zernio
+        // Create one isolated provider profile per local user. Selecting the first
+        // remote profile would let different SocialSparrow users share accounts.
         const createResult = await zernio.profiles.createProfile({
             body: { name: `${user.name || user.email}'s workspace` } as any,
         });
@@ -76,11 +68,19 @@ const getOrCreateZernioProfile = async (user: any): Promise<string> => {
  */
 export const generateAuthUrl = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const { platform } = req.params;
-        
-        // Safely extract the authenticated user from request (cast req to any for TS flexibility)
-        // Fallback to findOne for easier local debugging if req.user is not populated yet
-        const user = (req as any).user || await User.findOne(); 
+        const platform = Array.isArray(req.params.platform) ? req.params.platform[0] : req.params.platform;
+        const supportedPlatforms = ["twitter", "linkedin", "facebook", "instagram"];
+
+        if (!isZernioConfigured) {
+            res.status(503).json({ message: "Social account connections are not configured yet." });
+            return;
+        }
+        if (!platform || !supportedPlatforms.includes(platform.toLowerCase())) {
+            res.status(400).json({ message: "This social platform is not supported." });
+            return;
+        }
+
+        const user = req.user;
         
         if (!user) {
             res.status(401).json({ message: "User must be authenticated" });
@@ -91,7 +91,8 @@ export const generateAuthUrl = async (req: AuthRequest, res: Response, next: Nex
         const profileId = await getOrCreateZernioProfile(user);
 
         // Redirect URL where the user will land after authenticating with their social network
-        const redirectUrl = process.env.ZERNIO_REDIRECT_URI || "http://localhost:3000/api/auth/callback";
+        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+        const redirectUrl = process.env.ZERNIO_REDIRECT_URI || `${frontendUrl.replace(/\/$/, "")}/accounts?connected=1`;
 
         // Request the connection URL from Zernio
         const result = await zernio.connect.getConnectUrl({
@@ -103,7 +104,6 @@ export const generateAuthUrl = async (req: AuthRequest, res: Response, next: Nex
         });
 
         const data = result.data as any;
-        console.log("getConnectUrl response:", JSON.stringify(data, null, 2));
 
         const authUrl = data.authUrl;
         if (!authUrl) {
@@ -111,7 +111,7 @@ export const generateAuthUrl = async (req: AuthRequest, res: Response, next: Nex
         }
 
         // Return the login URL to the client
-        res.json({ url: authUrl });
+        res.status(200).json({ success: true, data: { authUrl } });
 
     } catch (error: any) {
         console.error("Error generating Auth URL:", error);
@@ -131,8 +131,12 @@ export const generateAuthUrl = async (req: AuthRequest, res: Response, next: Nex
  */
 export const syncAccounts = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        // Safely get user (cast req to any for TS flexibility)
-        const user = (req as any).user || await User.findOne();
+        if (!isZernioConfigured) {
+            res.status(503).json({ message: "Social account connections are not configured yet." });
+            return;
+        }
+
+        const user = req.user;
 
         if (!user) {
             res.status(401).json({ message: "User must be authenticated" });
@@ -171,7 +175,7 @@ export const syncAccounts = async (req: AuthRequest, res: Response): Promise<voi
 
             // Sync/Upsert (Update or Insert) the account details in our MongoDB database
             const account = await Account.findOneAndUpdate(
-                { zernioAccountId: zid },
+                { user: user._id, zernioAccountId: zid },
                 {
                     user: user._id,
                     platform: normalizedPlatform as any,
