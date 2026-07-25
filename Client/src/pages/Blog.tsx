@@ -11,7 +11,8 @@ const featuredPost = {
     author: "Kartik Singh",
     date: "July 24, 2026",
     readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"
+    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
+    link: "https://medium.com/@kartikvskumarsingh/10-ai-prompts-that-will-write-your-social-media-copy-for-the-next-month-c95fe4ef78d2"
 };
 
 const blogPosts = [
@@ -22,7 +23,8 @@ const blogPosts = [
         author: "Sarah Jenkins",
         date: "July 18, 2026",
         readTime: "5 min read",
-        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80"
+        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80",
+        link: "https://medium.com/@kartikvskumarsingh/the-2026-guide-to-hacking-the-linkedin-algorithm-what-actually-works-now-bf6d314abf28"
     },
     {
         title: "Tab Fatigue: The Silent Performance Killer in Social Agencies",
@@ -78,21 +80,21 @@ export default function Blog() {
                     {/* Featured Post */}
                     <ScrollReveal variant="flipUp" delay={0.2} duration={0.8} className="mb-16">
                         <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.25)" className="rounded-3xl overflow-hidden bg-[#1c1c20] border border-[#2c2c33] hover:border-orange-500/30 transition-all duration-300 shadow-2xl grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 sm:p-8">
-                            <div className="h-64 sm:h-80 lg:h-full rounded-2xl overflow-hidden relative">
+                            <a href={featuredPost.link} target="_blank" rel="noopener noreferrer" className="h-64 sm:h-80 lg:h-full rounded-2xl overflow-hidden relative block group-hover:opacity-90 transition-opacity">
                                 <img
                                     src={featuredPost.image}
                                     alt={featuredPost.title}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
-                            </div>
+                            </a>
                             <div className="flex flex-col justify-center">
                                 <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-orange-500/10 border border-orange-500/20 text-orange-400 w-fit mb-4">
                                     {featuredPost.category}
                                 </span>
-                                <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-white tracking-tight leading-snug hover:text-orange-400 transition-colors cursor-pointer">
+                                <a href={featuredPost.link} target="_blank" rel="noopener noreferrer" className="font-sans font-extrabold text-2xl sm:text-3xl text-white tracking-tight leading-snug hover:text-orange-400 transition-colors cursor-pointer block">
                                     {featuredPost.title}
-                                </h2>
+                                </a>
                                 <p className="mt-4 text-sm text-zinc-400 leading-relaxed">
                                     {featuredPost.excerpt}
                                 </p>
@@ -110,10 +112,10 @@ export default function Blog() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-xs font-bold text-orange-400 hover:text-orange-300 transition-colors cursor-pointer group">
+                                    <a href={featuredPost.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-orange-400 hover:text-orange-300 transition-colors cursor-pointer group">
                                         <span>Read Post</span>
                                         <ArrowRight className="size-3.5 group-hover:translate-x-1 transition-transform" />
-                                    </div>
+                                    </a>
                                 </div>
                             </div>
                         </SpotlightCard>
@@ -124,20 +126,20 @@ export default function Blog() {
                         {blogPosts.map((post, idx) => (
                             <ScrollReveal key={post.title} variant="fadeUp" delay={0.1 * (idx + 1)}>
                                 <SpotlightCard spotlightColor="rgba(255, 107, 0, 0.15)" className="rounded-2xl overflow-hidden bg-[#1c1c20] border border-[#2c2c33] hover:border-orange-500/20 hover:-translate-y-1 transition-all duration-300 shadow-lg flex flex-col h-full group">
-                                    <div className="h-48 overflow-hidden relative">
+                                    <a href={post.link || "#"} target={post.link ? "_blank" : undefined} rel={post.link ? "noopener noreferrer" : undefined} className="h-48 overflow-hidden relative block group-hover:opacity-90 transition-opacity">
                                         <img
                                             src={post.image}
                                             alt={post.title}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                         />
-                                    </div>
+                                    </a>
                                     <div className="p-6 flex flex-col flex-1">
                                         <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-zinc-800 border border-zinc-700 text-zinc-400 w-fit mb-3">
                                             {post.category}
                                         </span>
-                                        <h3 className="font-sans font-bold text-lg text-white mb-2 leading-snug group-hover:text-orange-400 transition-colors cursor-pointer">
+                                        <a href={post.link || "#"} target={post.link ? "_blank" : undefined} rel={post.link ? "noopener noreferrer" : undefined} className="font-sans font-bold text-lg text-white mb-2 leading-snug group-hover:text-orange-400 transition-colors cursor-pointer block">
                                             {post.title}
-                                        </h3>
+                                        </a>
                                         <p className="text-zinc-400 text-xs leading-relaxed mb-6 flex-1">
                                             {post.excerpt}
                                         </p>
