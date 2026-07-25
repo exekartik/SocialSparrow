@@ -2,7 +2,6 @@
   "name": "social-sparrow-root",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "build": "cd server && npm install && npm run build && cd ../Client && npm install && npm run build",
     "clear-db": "cd server && npm run clear-db",

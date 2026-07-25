@@ -399,7 +399,7 @@ export const sharePost = async (req: AuthRequest, res: Response): Promise<void> 
         const targetPlatforms = Array.isArray(post.platforms)
             ? post.platforms
             : typeof post.platforms === "string"
-                ? post.platforms.split(",").map((platform) => platform.trim()).filter(Boolean)
+                ? post.platforms.split(",").map((platform: string) => platform.trim()).filter(Boolean)
                 : post.platform ? [post.platform] : [];
         const accounts = await Account.find({
             user: req.user._id,

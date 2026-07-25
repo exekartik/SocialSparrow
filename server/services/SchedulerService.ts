@@ -18,7 +18,7 @@ const getTargetPlatforms = (post: InstanceType<typeof Post>): string[] => {
         return post.platforms;
     }
     if (typeof post.platforms === "string") {
-        return post.platforms.split(",").map((platform) => platform.trim()).filter(Boolean);
+        return post.platforms.split(",").map((platform: string) => platform.trim()).filter(Boolean);
     }
     return post.platform ? [post.platform] : [];
 };
